@@ -233,6 +233,16 @@ table.tb{width:100%;border-collapse:collapse;font-size:12px}
 .demobar{position:sticky;top:0;z-index:45;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-16px -20px 12px;padding:8px 20px;background:linear-gradient(90deg,#5A3E0A,#3A2C10);border-bottom:1px solid var(--gold);color:var(--gold2);font-size:12px;font-weight:500}
 .demobar .btn{margin-left:auto}
 @media (max-width:980px){.demobar{margin:-12px -12px 10px;padding:8px 12px}}
+.obj{margin:6px 0 8px;padding:8px 12px;border-left:3px solid var(--gold);background:rgba(217,180,106,.07);border-radius:8px;font-size:13px}
+.obj b{color:var(--gold2);font-weight:600}
+.obj.vazio{border-left-color:var(--amber);color:var(--amber);font-size:12px}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.rcard{background:var(--s2);border:1px solid var(--ln);border-radius:12px;padding:11px 13px;min-width:0}
+.rcard h4{font-size:10.5px;text-transform:uppercase;letter-spacing:.8px;color:var(--mu);font-weight:600;margin-bottom:5px}
+.rcard .tx{white-space:pre-wrap;word-break:break-word}
+.rcard .tx.v{color:var(--mu);font-style:italic;font-size:12px}
+.rcard.full{grid-column:1/-1}
+@media (max-width:700px){.rgrid{grid-template-columns:1fr}}
 .warnbox{background:rgba(245,181,71,.08);border:1px solid #6B5322;border-radius:10px;padding:8px 11px;color:#F2D49A;font-size:12px;margin-bottom:10px}
 
 @media (max-width:980px){
@@ -803,7 +813,7 @@ function tabelaProc(lista) {
   if (!lista.length) return `<div class="empty">Nenhum processo aqui.${editor() ? ' <a href="#" data-n>Abrir um processo</a>' : ''}</div>`;
   return `<div class="tsc"><table class="tb"><thead><tr><th>Nº</th><th>Processo</th><th class="hm">Rota</th><th class="hm">Responsável</th><th>Etapa</th><th>Contato</th><th class="hm">Próx. passo</th></tr></thead><tbody>${lista.map(p => {
     const c = cliDe(p.cliente_id); return `<tr class="cl" data-p="${p.id}"><td class="num">${esc(p.numero || '…')}${p.prioridade === 'Urgente' ? ' <span class="chip r">!</span>' : p.prioridade === 'Alta' ? ' <span class="chip a">↑</span>' : ''}</td>
-    <td style="min-width:160px"><div style="font-weight:500">${esc(p.titulo)}</div><div class="s11 mut">${esc(c ? c.nome : 'sem cliente')}${(p.tipos || []).length ? ' · ' + esc(p.tipos.join(', ')) : ''}</div></td>
+    <td style="min-width:160px"><div style="font-weight:500">${esc(p.titulo)}</div><div class="s11 mut">${esc(c ? c.nome : 'sem cliente')}${p.objetivo ? ' · 🎯 ' + esc(p.objetivo.length > 90 ? p.objetivo.slice(0, 88) + '…' : p.objetivo) : (p.tipos || []).length ? ' · ' + esc(p.tipos.join(', ')) : ''}</div></td>
     <td class="hm s11">${esc(rota(p))}</td><td class="hm"><span class="av" title="${esc(nomeDe(p.responsavel))}">${ini(nomeDe(p.responsavel))}</span> <span class="s11">${esc(nomeDe(p.responsavel).split(' ')[0])}</span></td>
     <td>${p.status === 'cancelado' ? '<span class="chip r">Cancelado</span>' : `${prog(p.etapa)}<div class="s11 mut" style="margin-top:3px">${ETN[p.etapa]}</div>`}</td><td>${contatoChip(p)}</td><td class="hm">${proxChip(p)}</td></tr>`;
   }).join('')}</tbody></table></div>`;
@@ -824,7 +834,7 @@ function vProcessos(el) {
   if (f.minha) l = l.filter(p => p.responsavel === S.user.id || (p.equipe || []).includes(S.user.id));
   if (f.alerta === 'sem') l = l.filter(p => (diasDesde(p.ultimo_contato) ?? 99) >= 7);
   if (f.alerta === 'venc') l = l.filter(p => p.proximo_em && diasDesde(p.proximo_em) >= 0);
-  if (f.q) { const t = f.q.toLowerCase(); l = l.filter(p => [p.numero, p.titulo, (cliDe(p.cliente_id) || {}).nome, p.origem, p.destino, (p.tipos || []).join(' '), p.descricao, p.proximo_passo].join(' ').toLowerCase().includes(t)); }
+  if (f.q) { const t = f.q.toLowerCase(); l = l.filter(p => [p.numero, p.titulo, (cliDe(p.cliente_id) || {}).nome, p.origem, p.destino, (p.tipos || []).join(' '), p.descricao, p.proximo_passo, p.objetivo, p.quem, p.andamento, p.pendencias].join(' ').toLowerCase().includes(t)); }
   el.innerHTML = topo('Processos', 'Cases', `<div class="tabs" style="margin:0"><button data-modo="lista" class="${f.modo === 'lista' ? 'on' : ''}">Lista</button><button data-modo="quadro" class="${f.modo === 'quadro' ? 'on' : ''}">Quadro</button></div>${editor() ? '<button class="btn" data-n>＋ Novo</button>' : ''}`) +
     `<div class="filters"><input class="in" id="fq" placeholder="Buscar nº, cliente, produto, país…" value="${esc(f.q)}">
       ${f.modo === 'lista' ? `<button class="pb ${!f.etapa ? 'on' : ''}" data-et="">Todas</button>${ETAPAS.slice(0, 4).map(([k, n]) => `<button class="pb ${f.etapa === k ? 'on' : ''}" data-et="${k}">${n}</button>`).join('')}` : ''}
@@ -850,6 +860,7 @@ function formProc(p = {}) {
   const ativosM = S.membros.filter(m => m.status === 'ativo');
   const resp = p.responsavel || S.user.id;
   return `${fld('titulo', 'Título do processo', p.titulo, { req: true, ph: 'Ex.: Bicicletas elétricas — fábrica de Shenzhen → distribuidor SP' })}
+  ${fld('objetivo', '🎯 Objetivo principal (a meta final deste processo)', p.objetivo, { req: true, ph: 'Ex.: Entregar 120 bicicletas com a marca do cliente em SP até março, com no máximo 2% de defeito' })}
   <div class="fld" data-f="cliente_id"><label>Cliente</label><select name="cliente_id"><option value="">— sem cliente ainda —</option><option value="__novo">＋ Cadastrar novo cliente…</option>${S.clientes.filter(c => c.status !== 'cancelado').map(c => `<option value="${c.id}" ${p.cliente_id === c.id ? 'selected' : ''}>${esc(c.nome)}${c.pais ? ' · ' + esc(c.pais) : ''}</option>`).join('')}</select></div>
   <div class="inline-new" id="novoCli" hidden><h4>Novo cliente (salva junto com o processo)</h4>
     <div class="row2">${fld('nc_nome', 'Empresa ou nome', p._nc_nome, { req: true })}${fld('nc_contato', 'Pessoa de contato', p._nc_contato)}</div>
@@ -886,7 +897,7 @@ function lerFormProc(form) {
   const g = n => (form[n] ? String(form[n].value || '').trim() : '');
   const etNome = g('etapa'), et = (ETAPAS.find(e => e[1] === etNome) || ETAPAS.find(e => e[0] === etNome) || ['lead'])[0];
   return {
-    titulo: g('titulo'), cliente_id: g('cliente_id') || null,
+    titulo: g('titulo'), ...(form.objetivo ? { objetivo: g('objetivo') || null } : {}), cliente_id: g('cliente_id') || null,
     tipos: g('tipos').split(',').map(s => s.trim()).filter(Boolean), origem: g('origem') || null, destino: g('destino') || null, outros_paises: g('outros_paises') || null,
     responsavel: g('responsavel') || null, equipe: g('equipe').split(',').filter(Boolean), etapa: et, prioridade: g('prioridade') || 'Normal',
     moeda: g('moeda').toUpperCase() || 'USD', valor_operacao: parseNum(g('valor_operacao')), honorario: parseNum(g('honorario')), honorario_tipo: g('honorario_tipo') || null,
@@ -896,6 +907,7 @@ function lerFormProc(form) {
 }
 async function validaECriaCliente(form, d) {
   if (!d.titulo) { marcaErro(form, 'titulo', 'Dê um título ao processo.'); return false; }
+  if (form.objetivo && !d.objetivo) { marcaErro(form, 'objetivo', 'Escreva o objetivo principal — qual é a meta final deste processo?'); return false; }
   if (form.valor_operacao.value.trim() && d.valor_operacao == null) { marcaErro(form, 'valor_operacao', 'Valor da operação: use só números (ex.: 120.000,00).'); return false; }
   if (form.honorario.value.trim() && d.honorario == null) { marcaErro(form, 'honorario', 'Honorário: use só números (ex.: 6.000).'); return false; }
   if (d.cliente_id === '__novo') {
@@ -918,7 +930,7 @@ function novoProcesso(pref = {}, depois) {
       if (!(await validaECriaCliente(form, d))) return false;
       const p = await q(sb.from('nb_processos').insert(d).select().single());
       if (depois) await depois(p);
-      await carregar(); toast(`Processo ${p.numero} aberto`); abrirProc(p.id);
+      await carregar(); toast(`Processo ${p.numero} aberto — preencha o resumo para quem for assumir`); S.ptab = 'resumo'; abrirProc(p.id);
     }
   });
   if (pref._novoCli) m.form.cliente_id.value = '__novo';
@@ -927,7 +939,7 @@ function novoProcesso(pref = {}, depois) {
 
 /* ---- Detalhe do processo ---- */
 async function abrirProc(id) {
-  S.procId = id; S.view = 'proc'; S.ptab = S.ptab || 'hist'; S.pend = [];
+  S.procId = id; S.view = 'proc'; S.ptab = S.ptab === 'arq' || S.ptab === 'dados' || S.ptab === 'hist' ? S.ptab : 'resumo'; if (S._ultimoProc !== id) S.ptab = 'resumo'; S._ultimoProc = id; S.pend = [];
   render(); window.scrollTo(0, 0);
   try { await carregarProc(id); render(); } catch (e) { toast(errMsg(e), true); }
 }
@@ -937,6 +949,7 @@ function vProc(el) {
   el.innerHTML = `<div class="top"><button class="btn sec sm" id="voltar">← Processos</button><span class="sp"></span>${canc ? '<span class="chip r">Cancelado</span>' : ''}</div>
   <div class="card phead"><div class="num" style="font-size:13px">${esc(p.numero)} ${p.prioridade !== 'Normal' ? `<span class="chip ${p.prioridade === 'Urgente' ? 'r' : p.prioridade === 'Alta' ? 'a' : ''}">${esc(p.prioridade)}</span>` : ''}</div>
     <div class="ttl">${esc(p.titulo)}</div>
+    ${p.objetivo ? `<div class="obj">🎯 <b>Objetivo:</b> ${esc(p.objetivo)}</div>` : `<div class="obj vazio">🎯 Sem objetivo definido${ed ? ' — <a href="#" id="defObj">definir agora</a>' : ''}</div>`}
     <div class="meta"><span><b>Cliente</b>${c ? `<a href="#" id="verCli">${esc(c.nome)}</a>` : '—'}</span><span><b>Rota</b>${esc(rota(p))}${p.outros_paises ? ' · ' + esc(p.outros_paises) : ''}</span>
       <span><b>Responsável</b>${esc(nomeDe(p.responsavel))}${(p.equipe || []).length ? ' + ' + p.equipe.map(u => esc(nomeDe(u).split(' ')[0])).join(', ') : ''}</span>
       <span><b>Último contato</b>${contatoChip(p)}</span><span><b>Tipo</b>${esc((p.tipos || []).join(', ') || '—')}</span>
@@ -947,7 +960,7 @@ function vProc(el) {
     ${p.proximo_passo || p.proximo_em ? `<div style="margin-top:8px" class="s11"><b class="mut">Próximo passo:</b> ${esc(p.proximo_passo || '')} ${p.proximo_em ? proxChip(p) : ''}</div>` : ''}
     <div class="etapas">${ETAPAS.map(([k, n], j) => `<button ${ed ? '' : 'disabled'} data-etapa="${k}" class="${j === i ? 'on' : j < i ? 'past' : ''}">${n}</button>`).join('')}</div>
   </div>
-  <div class="ptabs"><button data-pt="hist" class="${S.ptab === 'hist' ? 'on' : ''}">Histórico (${S.eventos.filter(e => e.tipo !== 'Sistema').length})</button><button data-pt="arq" class="${S.ptab === 'arq' ? 'on' : ''}">Arquivos (${S.arquivos.length})</button><button data-pt="dados" class="${S.ptab === 'dados' ? 'on' : ''}">Dados</button></div>
+ <div class="ptabs"><button data-pt="resumo" class="${S.ptab === 'resumo' ? 'on' : ''}">Resumo</button><button data-pt="hist" class="${S.ptab === 'hist' ? 'on' : ''}">Histórico (${S.eventos.filter(e => e.tipo !== 'Sistema').length})</button><button data-pt="arq" class="${S.ptab === 'arq' ? 'on' : ''}">Arquivos (${S.arquivos.length})</button><button data-pt="dados" class="${S.ptab === 'dados' ? 'on' : ''}">Dados</button></div>
   <div id="ptab"></div>`;
   $('#voltar').onclick = () => ir('processos');
   $$('[data-fo]', el).forEach(a => a.onclick = e => { e.preventDefault(); editarFornecedor(fornDe(a.dataset.fo)); });
@@ -958,7 +971,60 @@ function vProc(el) {
     try { await q(sb.from('nb_processos').update({ etapa: b.dataset.etapa }).eq('id', p.id)); p.etapa = b.dataset.etapa; toast('Etapa: ' + ETN[p.etapa]); await recarregar(); } catch (e) { toast(errMsg(e), true); }
   });
   const box = $('#ptab');
-  if (S.ptab === 'hist') tabHist(box, p, ed); else if (S.ptab === 'arq') tabArq(box, p, ed); else tabDados(box, p, ed);
+  const dob = $('#defObj'); if (dob) dob.onclick = e => { e.preventDefault(); editarResumo(p); };
+  if (S.ptab === 'resumo') tabResumo(box, p, ed); else if (S.ptab === 'hist') tabHist(box, p, ed); else if (S.ptab === 'arq') tabArq(box, p, ed); else tabDados(box, p, ed);
+}
+const RES = [['quem', 'Quem faz o quê', 'Ex.:\nGuilherme: fala com a fábrica pelo WeChat\nDébora: fala com o cliente\nTae: contrato e financeiro'],
+  ['como', 'Como está sendo conduzido', 'Canais, contatos-chave (nome, cargo, WeChat/WhatsApp), condições combinadas, onde estão os documentos…'],
+  ['feito', 'O que já foi feito', 'Principais marcos até aqui, com data (o detalhe fica no Histórico)'],
+  ['andamento', 'O que está sendo tratado agora', 'O que está em aberto neste momento e com quem'],
+  ['pendencias', 'Pendências e riscos', 'O que falta, o que pode dar errado, decisões que precisam ser tomadas']];
+function textoResumo(p) {
+  const c = cliDe(p.cliente_id);
+  return [`${p.numero} · ${p.titulo}`, `Cliente: ${c ? c.nome : '—'} · Rota: ${rota(p)} · Etapa: ${p.status === 'cancelado' ? 'Cancelado' : ETN[p.etapa]}`, `Responsável: ${nomeDe(p.responsavel)}`, '', `🎯 OBJETIVO: ${p.objetivo || '—'}`, '',
+    ...RES.flatMap(([k, t]) => [t.toUpperCase() + ':', p[k] || '—', '']), `PRÓXIMO PASSO: ${p.proximo_passo || '—'}${p.proximo_em ? ' (' + fData(p.proximo_em) + ')' : ''}`,
+    p.resumo_atualizado_em ? `\nResumo atualizado por ${nomeDe(p.resumo_atualizado_por)} em ${fDH(p.resumo_atualizado_em)}` : ''].join('\n');
+}
+function tabResumo(box, p, ed) {
+  const contatos = S.eventos.filter(e => e.tipo !== 'Sistema');
+  const atuou = {}; contatos.forEach(e => { const k = e.autor_nome || '—'; atuou[k] = atuou[k] || { n: 0, ult: e.data_evento, tipos: {} }; atuou[k].n++; if (e.data_evento > atuou[k].ult) atuou[k].ult = e.data_evento; atuou[k].tipos[e.tipo] = 1; });
+  const velho = p.resumo_atualizado_em ? diasDesde(p.resumo_atualizado_em) : null;
+  const vazio = !RES.some(([k]) => p[k]);
+  box.innerHTML = `<div class="card">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+      <h3 class="t" style="margin:0">Resumo para quem assumir</h3>
+      ${p.resumo_atualizado_em ? `<span class="s11 mut">atualizado por ${esc(nomeDe(p.resumo_atualizado_por) === '—' ? 'sistema' : nomeDe(p.resumo_atualizado_por))} · ${relTxt(p.resumo_atualizado_em)}</span>` : ''}
+      ${!vazio && velho != null && velho >= 14 && p.status === 'ativo' && p.etapa !== 'concluido' ? `<span class="chip a">desatualizado há ${velho} d</span>` : ''}
+      <span style="flex:1"></span>
+      <button class="btn sec sm" id="copRes">Copiar resumo</button>${ed ? `<button class="btn sm" id="edRes">${vazio ? 'Preencher resumo' : 'Atualizar resumo'}</button>` : ''}</div>
+    ${vazio ? `<div class="warnbox">Este processo ainda não tem resumo. Preencha quem faz o quê, como está sendo conduzido e o que já foi feito — assim qualquer sócio consegue assumir sem perguntar.</div>` : ''}
+    <div class="rgrid">
+      ${RES.map(([k, t], i) => `<div class="rcard ${i === 0 ? '' : ''}"><h4>${t}</h4><div class="tx ${p[k] ? '' : 'v'}">${p[k] ? esc(p[k]) : 'Não preenchido'}</div></div>`).join('')}
+      <div class="rcard"><h4>Próximo passo</h4><div class="tx ${p.proximo_passo ? '' : 'v'}">${p.proximo_passo ? esc(p.proximo_passo) + (p.proximo_em ? ' · ' + fData(p.proximo_em) : '') : 'Não marcado'}</div></div>
+    </div></div>
+  <div class="card" style="margin-top:12px"><h3 class="t">Quem já atuou neste processo <small>automático, pelo histórico</small></h3>
+    ${Object.keys(atuou).length ? `<div class="list">${Object.entries(atuou).sort((a, b) => b[1].ult.localeCompare(a[1].ult)).map(([n, a]) => `<div class="it" style="cursor:default"><span class="av">${ini(n)}</span><div style="flex:1;min-width:0"><b>${esc(n)}</b> <span class="s11 mut">${a.n} registro(s) · último ${relTxt(a.ult)}</span><div class="s11 mut">${Object.keys(a.tipos).map(t => (EVI[t] || '') + ' ' + t).join(' · ')}</div></div></div>`).join('')}</div>` : '<div class="empty">Ninguém registrou contato ainda.</div>'}
+    ${contatos.length ? `<h4 class="s11 mut" style="margin:12px 0 4px;text-transform:uppercase;letter-spacing:.8px">Últimos registros</h4><div class="list">${contatos.slice(0, 3).map(e => `<div class="it" data-gohist><span class="av">${EVI[e.tipo] || '•'}</span><div style="flex:1;min-width:0"><div class="s11 mut">${esc(e.tipo)} · ${fDH(e.data_evento)} · ${esc(e.autor_nome || '')}</div><div>${esc((e.texto || '').slice(0, 160))}</div></div></div>`).join('')}</div><p style="margin-top:6px"><a href="#" data-gohist>Ver histórico completo →</a></p>` : ''}
+  </div>`;
+  $$('[data-gohist]', box).forEach(a => a.onclick = e => { e.preventDefault(); S.ptab = 'hist'; render(); });
+  $('#copRes').onclick = async () => { try { await navigator.clipboard.writeText(textoResumo(p)); toast('Resumo copiado — cole no WhatsApp ou e-mail'); } catch (e) { toast('Não consegui copiar automaticamente.', true); } };
+  const er = $('#edRes'); if (er) er.onclick = () => editarResumo(p);
+}
+function editarResumo(p) {
+  const ativosM = S.membros.filter(m => m.status === 'ativo');
+  const m = modal('Resumo · ' + esc(p.numero), `<p class="s11 mut" style="margin-bottom:10px">Escreva como se fosse passar o processo para outra pessoa amanhã. O detalhe do dia a dia continua no Histórico.</p>
+    ${fld('objetivo', '🎯 Objetivo principal', p.objetivo, { req: true, ph: 'Qual é a meta final deste processo?' })}
+    <div class="fld" data-f="quem"><label>${RES[0][1]}</label><div class="pick" id="quemPick">${ativosM.map(x => `<button type="button" class="pb" data-nm="${esc((x.nome || x.email).split(' ')[0])}">＋ ${esc((x.nome || x.email).split(' ')[0])}</button>`).join('')}</div><textarea name="quem" placeholder="${esc(RES[0][2])}">${esc(p.quem || '')}</textarea></div>
+    ${RES.slice(1).map(([k, t, ph]) => fld(k, t, p[k], { type: 'textarea', ph })).join('')}
+    <div class="row2">${fld('proximo_passo', 'Próximo passo', p.proximo_passo)}${datePick('proximo_em', 'Quando', p.proximo_em, [['Amanhã', 1], ['3 dias', 3], ['1 semana', 7], ['2 semanas', 14]])}</div>`, {
+    wide: true, saveTxt: 'Salvar resumo', onSave: async form => {
+      const g = n => form[n].value.trim();
+      if (!g('objetivo')) { marcaErro(form, 'objetivo', 'Escreva o objetivo principal.'); return false; }
+      const d = { objetivo: g('objetivo') }; RES.forEach(([k]) => d[k] = g(k) || null); d.proximo_passo = g('proximo_passo') || null; d.proximo_em = g('proximo_em') || null;
+      await q(sb.from('nb_processos').update(d).eq('id', p.id)); toast('Resumo salvo'); S.ptab = 'resumo'; await recarregar();
+    }
+  });
+  $$('#quemPick .pb', m.form).forEach(b => b.onclick = () => { const ta = m.form.quem; ta.value = (ta.value.trim() ? ta.value.replace(/\s*$/, '') + '\n' : '') + b.dataset.nm + ': '; ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); m.form.dispatchEvent(new Event('input')); });
 }
 function thumb(a) {
   const u = a.caminho ? S.urls[a.caminho] : null;
@@ -1184,7 +1250,7 @@ function vLeads(el) {
   $$('[data-conv]', el).forEach(b => b.onclick = () => {
     const x = S.leads.find(l => l.id === b.dataset.conv);
     const ja = S.clientes.find(c => (x.email && (c.email || '').toLowerCase() === x.email.toLowerCase()) || (x.empresa && c.nome.toLowerCase() === x.empresa.toLowerCase()));
-    const pref = { titulo: [x.interesse, x.empresa || x.nome].filter(Boolean).join(' — '), descricao: x.mensagem, etapa: 'lead', proximo_passo: 'Responder o contato do site', proximo_em: hojeISO() };
+    const pref = { titulo: [x.interesse, x.empresa || x.nome].filter(Boolean).join(' — '), objetivo: `Entender a necessidade de ${x.empresa || x.nome} (${x.interesse || 'contato do site'}) e transformar em proposta.`, descricao: x.mensagem, etapa: 'lead', proximo_passo: 'Responder o contato do site', proximo_em: hojeISO() };
     if (ja) pref.cliente_id = ja.id; else Object.assign(pref, { _novoCli: true, _nc_nome: x.empresa || x.nome, _nc_contato: x.empresa ? x.nome : '', _nc_pais: x.pais, _nc_email: x.email, _nc_telefone: x.telefone, _nc_origem: 'Site' });
     novoProcesso(pref, async p => {
       await q(sb.from('nb_leads').update({ status: 'convertido', processo_id: p.id, cliente_id: p.cliente_id }).eq('id', x.id));
@@ -1318,7 +1384,7 @@ function editarFornecedor(f) {
   dropZone($('#fdz', m.form), add);
   $$('[data-pp]', m.form).forEach(x => x.onclick = () => { m.fechar(); abrirProc(x.dataset.pp); });
   const pf = $('#procForn', m.form);
-  if (pf) pf.onclick = () => { m.fechar(); novoProcesso({ titulo: [f.produtos || f.categoria, f.empresa].filter(Boolean).join(' — '), origem: f.pais || 'China', destino: 'Brasil', tipos: ['Compra e venda', 'Busca de fornecedor'], fornecedores: [f.id], etapa: 'lead' }); };
+  if (pf) pf.onclick = () => { m.fechar(); novoProcesso({ titulo: [f.produtos || f.categoria, f.empresa].filter(Boolean).join(' — '), objetivo: `Importar ${f.produtos || f.categoria || 'produtos'} da ${f.empresa} para o Brasil.`, origem: f.pais || 'China', destino: 'Brasil', tipos: ['Compra e venda', 'Busca de fornecedor'], fornecedores: [f.id], etapa: 'lead' }); };
   if (!novo) arquivosForn(f.id).then(a => {
     lista = a; const el = $('#flist', m.form); if (!el) return;
     el.innerHTML = a.length ? a.map(x => thumb(x)).join('') : '<span class="s11 mut">Nenhum arquivo ainda.</span>';
@@ -1387,6 +1453,9 @@ function demoClient(DB, me) {
             if (payload.etapa && payload.etapa !== r.etapa) { msg.push('Etapa: ' + ETN[r.etapa] + ' → ' + ETN[payload.etapa] + '.'); r.concluido_em = payload.etapa === 'concluido' ? now() : null; }
             if (payload.status && payload.status !== r.status) { msg.push(payload.status === 'cancelado' ? 'Processo cancelado.' : 'Processo reativado.'); r.canceled_at = payload.status === 'cancelado' ? now() : null; }
             if ('responsavel' in payload && payload.responsavel !== r.responsavel) msg.push('Responsável: ' + nomeDe(r.responsavel) + ' → ' + nomeDe(payload.responsavel) + '.');
+            if ('objetivo' in payload && payload.objetivo !== r.objetivo) msg.push('Objetivo: ' + (payload.objetivo || '—') + '.');
+            const rk = ['quem', 'como', 'feito', 'andamento', 'pendencias'].filter(k => k in payload && (payload[k] || null) !== (r[k] || null));
+            if (rk.length) { msg.push('Resumo atualizado.'); r.resumo_atualizado_em = now(); r.resumo_atualizado_por = me; }
             if ('honorario' in payload && payload.honorario !== r.honorario) msg.push('Honorário: ' + (r.honorario ?? '—') + ' → ' + (payload.honorario ?? '—') + ' ' + (payload.moeda || r.moeda || '') + '.');
             if (msg.length) ev(r.id, 'Sistema', msg.join(' '));
             r.updated_at = now();
@@ -1502,9 +1571,40 @@ function demoSeed(myId, myEmail) {
     { k: 'alho', titulo: 'Alho argentino para o Vietnã', tipos: ['Pesquisa de mercado', 'Compra e venda'], o: 'Argentina', d: 'Vietnã', resp: M.deb, eq: [], etapa: 'lead', prio: 'Normal', moeda: 'USD', ini: 35, prox: null, cancel: 20,
       desc: 'Avaliar venda de alho argentino ao Vietnã.', ev: [[34, 'Reunião', M.deb, 'Conversa com o Martín.'], [21, 'Nota', M.deb, 'Preço da Ásia muito abaixo; produtor preferiu manter os mercados atuais. Encerrado por ora.']] }
   ];
+  const DR = {
+    pedal: ['Entregar 120 bicicletas elétricas com a marca da Pedal Brasil em SP até março, com no máximo 2% de defeito.',
+      'Guilherme: fábrica (WeChat com Kevin Wang), inspeções e fotos da produção.\nDébora: relação com o cliente (Ricardo).\nTae: contrato, honorário e frete.',
+      'Fábrica: Tianjin Velo Bikes (Kevin Wang, WeChat kevinwang_cn). Cliente: Ricardo Alves, por WhatsApp.\nPagamento: 30% no pedido direto à fábrica, 70% só após nossa inspeção.\nContrato e PI na aba Arquivos.',
+      '08/09 reunião com o cliente · 14/09 visita a 3 fábricas, escolhida a Tianjin Velo · 21/09 proposta aceita · 01/10 sinal de 30% pago e contrato assinado · 15/10 produção em 80%.',
+      'Acompanhando o fim da produção e marcando a inspeção final.',
+      'Inspeção final antes do saldo de 70%. Frete marítimo ainda não cotado (pedir à FCA). Prazo de chegada apertado para março.', 3],
+    aqua: ['Fechar a pesquisa de mercado de purificadores (US$ 4.500) e virar a porta de entrada da Huaxin no Brasil.',
+      'Pedro: proposta e relatório.\nGuilherme: contato com Mr. Zhou em Foshan.',
+      'Mr. Zhou Wei prefere e-mail em inglês; reunião presencial com o Guilherme quando precisar.',
+      '07/10 reunião em Foshan · 13/10 proposta enviada.', 'Aguardando resposta da proposta.', 'Se aprovar: precisamos de 10 entrevistas com distribuidores em 30 dias.', 6],
+    curitiba: ['Levar 3 empresários de Curitiba à Canton Fair e fechar pelo menos 2 fornecedores para eles.',
+      'Pedro: relação com o Marcelo (líder do grupo).\nGuilherme: carta-convite, hotel, intérprete e agenda em Guangzhou.',
+      'Grupo de WhatsApp com os 3 empresários. Roteiro na aba Arquivos.', '29/09 confirmados 3 participantes · 08/10 roteiro preliminar enviado.',
+      'Esperando os passaportes para emitir a carta-convite.', 'Sem passaporte não sai o visto — prazo crítico.', 20],
+    cafe: ['Vender o primeiro lote de café especial do Sul de Minas para uma rede de cafeterias em Xangai.'],
+    vision: ['Deixar a RoadVision com CNPJ, conta bancária e produto homologado no Brasil até o fim do 1º trimestre.',
+      'Tae: coordenação e contato com Ms. Lin.\nDébora: contador e despachante indicados.',
+      'Videochamadas semanais com Ms. Lin (terças, 9h Brasil). Documentos da matriz em tradução juramentada.',
+      '20/09 primeira call · 27/09 contrato assinado · 09/10 contador e despachante apresentados.', 'Abertura do CNPJ e plano de homologação no Inmetro.', 'Tradução juramentada atrasando. Conta bancária para sócio estrangeiro costuma demorar.', 1],
+    chef: ['Lançar 500 kits de panelas com o nome da Chef Renata, com custo final abaixo de R$ 180 o kit.',
+      'Pedro: relação com a chef.\nGuilherme: fábrica e amostras.', 'Fábrica Yongkang Cookware (Mr. Huang). Logo gravado a laser.', '04/10 briefing com a chef · 10/10 fábrica topou OEM.', 'Amostra da frigideira a caminho.', 'Custo do frete aéreo da amostra; aprovação estética da chef.', 8],
+    ring: ['Importar 300 smart rings e validar se vendem no Brasil antes de um pedido maior.',
+      'Guilherme: fábrica Xinda e controle de qualidade.\nPedro: cliente (Fit&Co) e vendas.', 'Lily Chen (Xinda) por WeChat. Cliente quer app em português.',
+      '25/09 vistos 6 fornecedores na feira de HK · 10/10 pedido de 300 un. confirmado.', 'Negociando a tradução do app.', 'Sem app em português o cliente pode desistir. Verificar certificação Anatel.', 25],
+    carne: ['Abrir um canal de exportação de carne bovina para um importador na Coreia (2 contêineres/mês).'],
+    vento: ['Garantir que os 4.800 ventiladores embarcassem sem defeito (AQL 2.5).',
+      'Guilherme: inspeção em Ningbo.\nTae: relatório ao cliente.', 'Inspeção pré-embarque com amostragem AQL 2.5.', 'Inspeção feita, 2 caixas trocadas, relatório entregue e honorário recebido.', 'Concluído.', '—', 49],
+    alho: ['Avaliar se o alho argentino tinha preço para competir no Vietnã.']
+  };
   PROC.forEach(P => {
     seq++; const id = 'demo-proc-' + P.k, aberto = ago(P.ini, 9);
     const p = { id, numero: 'NB-' + new Date().getFullYear() + '-' + String(seq).padStart(4, '0'), seq, titulo: P.titulo, cliente_id: CL[P.k], tipos: P.tipos, origem: P.o, destino: P.d, responsavel: P.resp, equipe: P.eq, etapa: P.etapa, prioridade: P.prio, moeda: P.moeda, valor_operacao: P.valor ?? null, honorario: P.hon ?? null, honorario_tipo: P.honT || null, inicio: dia(-P.ini), prazo: P.prazo ? dia(P.prazo) : null, proximo_passo: P.prox, proximo_em: P.prox ? dia(P.proxEm) : null, descricao: P.desc, status: P.cancel ? 'cancelado' : 'ativo', canceled_at: P.cancel ? ago(P.cancel, 18) : null, concluido_em: P.etapa === 'concluido' ? ago(49, 17) : null, created_by: P.resp, created_at: aberto, updated_at: aberto, fornecedores: P.forn || [], ultimo_contato: aberto };
+    const r = DR[P.k]; if (r) Object.assign(p, { objetivo: r[0], quem: r[1] || null, como: r[2] || null, feito: r[3] || null, andamento: r[4] || null, pendencias: r[5] || null, resumo_atualizado_em: r[1] ? ago(r[6] ?? 2, 18) : null, resumo_atualizado_por: r[1] ? P.resp : null });
     DB.nb_processos.push(p);
     DB.nb_eventos.push({ id: id + '-e0', processo_id: id, tipo: 'Sistema', texto: 'Processo aberto: ' + p.numero, data_evento: aberto, autor: P.resp, autor_nome: nm[P.resp], created_at: aberto });
     (P.etHist || []).forEach(([d, t], i) => DB.nb_eventos.push({ id: id + '-s' + i, processo_id: id, tipo: 'Sistema', texto: t, data_evento: ago(d, 17), autor: P.resp, autor_nome: nm[P.resp], created_at: ago(d, 17) }));
