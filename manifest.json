@@ -1,0 +1,14 @@
+{
+  "name": "New Bridges",
+  "short_name": "New Bridges",
+  "description": "New Bridges — controle de processos de comércio exterior",
+  "start_url": "./#erp",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#060A16",
+  "theme_color": "#060A16",
+  "icons": [
+    { "src": "icon-v2.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "favicon-192.png", "sizes": "192x192", "type": "image/png" }
+  ]
+}
