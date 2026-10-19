@@ -230,6 +230,9 @@ table.tb{width:100%;border-collapse:collapse;font-size:12px}
 .viewer img,.viewer video{max-width:100%;max-height:72vh;display:block;margin:0 auto;border-radius:10px}
 .pending{max-width:420px}
 .prev td,.prev th{font-size:11px}
+.demobar{position:sticky;top:0;z-index:45;display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:-16px -20px 12px;padding:8px 20px;background:linear-gradient(90deg,#5A3E0A,#3A2C10);border-bottom:1px solid var(--gold);color:var(--gold2);font-size:12px;font-weight:500}
+.demobar .btn{margin-left:auto}
+@media (max-width:980px){.demobar{margin:-12px -12px 10px;padding:8px 12px}}
 .warnbox{background:rgba(245,181,71,.08);border:1px solid #6B5322;border-radius:10px;padding:8px 11px;color:#F2D49A;font-size:12px;margin-bottom:10px}
 
 @media (max-width:980px){
@@ -333,6 +336,11 @@ table.tb{width:100%;border-collapse:collapse;font-size:12px}
     </div>
   </div></section>
 
+  <section class="blk" id="china"><div class="sec-w">
+    <h2 data-i="china_h"></h2><p class="sub" data-i="china_p"></p>
+    <div class="grid4" id="chinaGrid"></div>
+  </div></section>
+
   <section class="blk" id="contato"><div class="sec-w two">
     <div>
       <h2 data-i="contato_h"></h2>
@@ -368,7 +376,8 @@ const SB_URL = 'https://agdqlnaedojcgivwluty.supabase.co';
 const SB_KEY = 'sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP';
 const BUCKET = 'nb-arquivos';
 const MAX_MB = 50;
-const sb = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'newbridges-auth' } });
+const sbReal = window.supabase.createClient(SB_URL, SB_KEY, { auth: { persistSession: true, autoRefreshToken: true, storageKey: 'newbridges-auth' } });
+let sb = sbReal;
 
 /* =================== UTIL =================== */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -409,6 +418,8 @@ const T = {
     svc: [['Pesquisa de mercado', 'Preço, concorrência, demanda e regras de importação antes de você investir.'], ['Fornecedores e compradores', 'Encontramos, visitamos e checamos fábricas, distribuidores e parceiros.'], ['Feiras', 'Acompanhamento em feiras na China e no Brasil, com agenda, intérprete e negociação.'], ['Recepção e viagem', 'Pick-up no aeroporto, hotel, transporte e roteiro de visitas.'], ['Compra e venda', 'Negociamos e operamos a compra e a venda por você, com pagamentos por etapa.'], ['Inspeção e qualidade', 'Inspeção antes do embarque, com fotos e vídeos de cada etapa.'], ['Logística e documentos', 'Frete, despacho e documentação com parceiros de confiança.'], ['Estruturação', 'Abertura de empresa e indicação de contadores, advogados e bancos.']],
     como_h: 'Como funciona', como_p: 'Simples, transparente e com tudo registrado.',
     steps: [['Conversa', 'Entendemos o objetivo, o produto, o prazo e o orçamento.'], ['Proposta', 'Escopo, custos e riscos por escrito, antes de começar.'], ['Execução', 'Cada projeto ganha um número. Você acompanha com fotos, vídeos e relatórios.'], ['Entrega', 'Mercadoria, contrato ou estrutura funcionando — com o histórico completo.']],
+    china_h: 'Gente nossa do lado de lá', china_p: 'A maioria das empresas de importação vai à China duas vezes por ano. Nós moramos lá.',
+    china: [['Base em Shenzhen', 'Sócio morando em Shenzhen, perto de boa parte das fábricas de eletrônicos e bens de consumo.'], ['Língua e cultura', 'Entendemos a língua e a forma chinesa de fazer negócio — relação de confiança (guanxi) antes do contrato.'], ['Fábrica visitada', 'Visitamos o fornecedor, filmamos a linha e conferimos a amostra antes de qualquer pagamento.'], ['Nos dois sentidos', 'Levamos fornecedores chineses ao mercado brasileiro e produtos brasileiros à Ásia.']],
     rede_h: 'Uma rede nos dois lados', rede_p: 'Sócios brasileiros com base em São Paulo e em Shenzhen, com contatos em indústria, comércio e serviços nos dois países. Para empresas chinesas que querem vender no Brasil e para brasileiras que querem comprar ou produzir na China.',
     rota1: 'China → Brasil', rota2: 'Brasil → China', rota3: 'Outros países',
     risk_h: 'Menos risco em cada etapa', risk1: 'Fornecedor visitado antes de qualquer pagamento', risk2: 'Pagamentos divididos por etapa', risk3: 'Contratos e documentos revisados', risk4: 'Inspeção antes do embarque', risk5: 'Tudo registrado, com fotos e vídeos',
@@ -428,6 +439,8 @@ const T = {
     svc: [['Market research', 'Prices, competition, demand and import rules before you invest.'], ['Suppliers and buyers', 'We find, visit and vet factories, distributors and partners.'], ['Trade fairs', 'Fair support in China and Brazil, with schedule, interpreter and negotiation.'], ['Arrival and travel', 'Airport pick-up, hotel, transport and visit itinerary.'], ['Buying and selling', 'We negotiate and run purchases and sales for you, with staged payments.'], ['Inspection and quality', 'Pre-shipment inspection with photos and videos of every step.'], ['Logistics and documents', 'Freight, customs and paperwork with trusted partners.'], ['Company setup', 'Company incorporation and referrals to accountants, lawyers and banks.']],
     como_h: 'How it works', como_p: 'Simple, transparent and fully documented.',
     steps: [['Talk', 'We understand your goal, product, timeline and budget.'], ['Proposal', 'Scope, costs and risks in writing before we start.'], ['Execution', 'Each project gets a number. You follow it with photos, videos and reports.'], ['Delivery', 'Goods, contract or structure up and running — with the full record.']],
+    china_h: 'Our own people on the other side', china_p: 'Most import companies visit China twice a year. We live there.',
+    china: [['Based in Shenzhen', 'A partner living in Shenzhen, close to many electronics and consumer-goods factories.'], ['Language and culture', 'We understand the language and the Chinese way of doing business — trust (guanxi) before the contract.'], ['Factory visited', 'We visit the supplier, film the line and check the sample before any payment.'], ['Both directions', 'We bring Chinese suppliers to the Brazilian market and Brazilian products to Asia.']],
     rede_h: 'A network on both sides', rede_p: 'Brazilian partners based in São Paulo and Shenzhen, with contacts in industry, trade and services in both countries. For Chinese companies that want to sell in Brazil and Brazilian companies that want to buy or manufacture in China.',
     rota1: 'China → Brazil', rota2: 'Brazil → China', rota3: 'Other countries',
     risk_h: 'Less risk at every step', risk1: 'Supplier visited before any payment', risk2: 'Payments split by milestone', risk3: 'Contracts and documents reviewed', risk4: 'Pre-shipment inspection', risk5: 'Everything recorded, with photos and videos',
@@ -447,6 +460,8 @@ const T = {
     svc: [['市场调研', '投资前了解价格、竞争、需求和进口规定。'], ['供应商与买家', '寻找、实地拜访并核实工厂、经销商和合作伙伴。'], ['展会陪同', '在中国和巴西陪同参展，安排行程、翻译和谈判。'], ['接待与出行', '机场接机、酒店、交通和参观行程。'], ['采购与销售', '代您谈判并执行采购和销售，分阶段付款。'], ['验货与质量', '出货前验货，每个环节都有照片和视频。'], ['物流与单证', '与可靠伙伴合作处理运输、报关和文件。'], ['公司落地', '协助注册公司，推荐会计师、律师和银行。']],
     como_h: '合作流程', como_p: '简单、透明、全程记录。',
     steps: [['沟通', '了解您的目标、产品、时间和预算。'], ['方案', '开始前提供书面的范围、费用和风险说明。'], ['执行', '每个项目都有编号，您可通过照片、视频和报告跟进。'], ['交付', '货物、合同或公司架构落地，并附完整记录。']],
+    china_h: '在中国有我们自己的人', china_p: '大多数进口公司一年去两次中国，而我们就住在这里。',
+    china: [['深圳本地团队', '合伙人常驻深圳，靠近大量电子和消费品工厂。'], ['语言与文化', '理解中文和中国的商业方式——先建立信任（关系），再签合同。'], ['实地验厂', '付款前我们会拜访供应商、拍摄生产线并检查样品。'], ['双向服务', '帮助中国供应商进入巴西市场，也把巴西产品带到亚洲。']],
     rede_h: '两地都有我们的网络', rede_p: '我们是常驻圣保罗和深圳的巴西合伙人，在两国的工业、贸易和服务领域都有人脉。服务想进入巴西市场的中国企业，以及想在中国采购或生产的巴西企业。',
     rota1: '中国 → 巴西', rota2: '巴西 → 中国', rota3: '其他国家',
     risk_h: '每一步都降低风险', risk1: '付款前先实地拜访供应商', risk2: '按阶段分期付款', risk3: '合同与文件经过审核', risk4: '出货前验货', risk5: '全程记录，附照片和视频',
@@ -464,6 +479,7 @@ function aplicaIdioma() {
   $$('[data-i]').forEach(el => { const v = t[el.dataset.i]; if (v == null) return; if (el.hasAttribute('data-html')) el.innerHTML = v; else el.textContent = v; });
   $$('#langSw button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
   $('#svcGrid').innerHTML = t.svc.map((s, i) => `<div class="card svc"><div class="ic">${SVC_IC[i]}</div><h3>${esc(s[0])}</h3><p>${esc(s[1])}</p></div>`).join('');
+  $('#chinaGrid').innerHTML = t.china.map((s, i) => `<div class="card svc"><div class="ic">${['⌂', '文', '✓', '⇄'][i]}</div><h3>${esc(s[0])}</h3><p>${esc(s[1])}</p></div>`).join('');
   $('#stepsGrid').innerHTML = t.steps.map((s, i) => `<div class="card"><div class="n">0${i + 1}</div><h3>${esc(s[0])}</h3><p>${esc(s[1])}</p></div>`).join('');
   const cur = $('#intSel').value; $('#intSel').innerHTML = t.ints.map(x => `<option>${esc(x)}</option>`).join(''); if (cur) $('#intSel').selectedIndex = Math.max(0, [...$('#intSel').options].findIndex(o => o.value === cur));
 }
@@ -497,15 +513,19 @@ const EVI = { 'Nota': '✎', 'Ligação': '☏', 'Reunião': '◷', 'Visita': '�
 const ARQ = ['Foto', 'Vídeo', 'PDF / documento', 'Contrato', 'Invoice / PI', 'Proposta', 'Link', 'Outro'];
 const ORIG = ['Débora', 'Guilherme', 'Pedro', 'Tae', 'Site', 'Feira'];
 const IDIOMAS = ['Português', 'Inglês', 'Chinês', 'Coreano', 'Espanhol'];
+const FCAT = ['Eletrônicos', 'Wearables', 'Áudio', 'Casa e cozinha', 'Eletroportáteis', 'Segurança / câmeras', 'Automotivo', 'Higiene / beleza', 'Alimentos', 'Agro'];
+const FEIRAS = ['Canton Fair', 'HK Electronics Fair', 'Feira em São Paulo', 'SIAL China', 'Visita à fábrica', 'Indicação'];
+const FSTAT = ['Novo', 'Em contato', 'Amostra pedida', 'Aprovado', 'Descartado'];
 const PAPEIS = { admin: 'Administrador', socio: 'Sócio', equipe: 'Equipe', consulta: 'Só consulta' };
-const NAV = [['painel', 'Painel', 'Dashboard', '◧'], ['processos', 'Processos', 'Cases', '▤'], ['clientes', 'Clientes', 'Clients', '◎'], ['leads', 'Leads do site', 'Website leads', '✉'], ['arquivo', 'Arquivo', 'Archive', '⌛'], ['equipe', 'Equipe', 'Team', '◉']];
+const NAV = [['painel', 'Painel', 'Dashboard', '◧'], ['processos', 'Processos', 'Cases', '▤'], ['clientes', 'Clientes', 'Clients', '◎'], ['fornecedores', 'Fornecedores', 'Suppliers', '◆'], ['leads', 'Leads do site', 'Website leads', '✉'], ['arquivo', 'Arquivo', 'Archive', '⌛'], ['equipe', 'Equipe', 'Team', '◉']];
 
 /* =================== ERP · ESTADO =================== */
-const S = { user: null, me: null, membros: [], clientes: [], processos: [], leads: [], recentes: [], view: 'painel', procId: null, ptab: 'hist', eventos: [], arquivos: [], urls: {}, f: { q: '', etapa: '', resp: '', minha: false, modo: lsGet('nb-modo') || 'lista' }, cq: '', arqF: 'todos', fcat: '', cal: new Date(), pend: [] };
+const S = { demo: false, forn: [], fq: '', fcatF: '', fstF: '', user: null, me: null, membros: [], clientes: [], processos: [], leads: [], recentes: [], view: 'painel', procId: null, ptab: 'hist', eventos: [], arquivos: [], urls: {}, f: { q: '', etapa: '', resp: '', minha: false, modo: lsGet('nb-modo') || 'lista' }, cq: '', arqF: 'todos', fcat: '', cal: new Date(), pend: [] };
 const editor = () => S.me && S.me.status === 'ativo' && S.me.papel !== 'consulta';
 const nomeDe = uid => { const m = S.membros.find(x => x.user_id === uid); return m ? (m.nome || m.email) : '—'; };
 const cliDe = id => S.clientes.find(c => c.id === id);
 const procDe = id => S.processos.find(p => p.id === id);
+const fornDe = id => S.forn.find(f => f.id === id);
 const ativos = () => S.processos.filter(p => p.status === 'ativo' && p.etapa !== 'concluido');
 const rota = p => [p.origem, p.destino].filter(Boolean).join(' → ') || '—';
 const etIdx = e => ETAPAS.findIndex(x => x[0] === e);
@@ -516,14 +536,16 @@ const proxChip = p => { if (!p.proximo_em) return '<span class="mut">—</span>'
 /* =================== ERP · DADOS =================== */
 async function q(promise) { const { data, error } = await promise; if (error) throw error; return data; }
 async function carregar() {
-  const [m, c, p, l, r] = await Promise.all([
+  const [m, c, p, l, r, f] = await Promise.all([
     q(sb.from('nb_membros').select('*').order('nome')),
     q(sb.from('nb_clientes').select('*').order('nome')),
     q(sb.from('nb_processos').select('*').order('created_at', { ascending: false })),
     q(sb.from('nb_leads').select('*').order('created_at', { ascending: false })),
-    q(sb.from('nb_eventos').select('*').order('created_at', { ascending: false }).limit(25))
+    q(sb.from('nb_eventos').select('*').order('created_at', { ascending: false }).limit(25)),
+    q(sb.from('nb_fornecedores').select('*').order('empresa')).catch(() => null)
   ]);
   S.membros = m || []; S.clientes = c || []; S.processos = p || []; S.leads = l || []; S.recentes = r || [];
+  S.forn = f || []; S.fornOk = f !== null;
 }
 async function carregarProc(id) {
   const [e, a] = await Promise.all([
@@ -604,7 +626,7 @@ function telaPendente() {
   $('#pRe').onclick = () => entrou(S.user);
   $('#pOut').onclick = sair;
 }
-async function sair() { await sb.auth.signOut(); S.user = S.me = null; telaLogin(); }
+async function sair() { if (S.demo) { S.demo = false; sb = sbReal; S.urls = {}; } await sbReal.auth.signOut(); S.user = S.me = null; telaLogin(); }
 
 /* =================== ERP · COMPONENTES DE FORMULÁRIO =================== */
 function pick(name, label, val, opts, o = {}) {
@@ -706,27 +728,28 @@ function render() {
     <aside class="side"><span class="logo">NEW<b>BRIDGES</b></span>
       ${NAV.map(([k, l, en, ic]) => `<button class="nv ${atual === k ? 'on' : ''}" data-v="${k}"><span class="ic">${ic}</span><span>${l}<small>${en}</small></span>${bd(k)}</button>`).join('')}
       <div class="me"><div style="display:flex;gap:8px;align-items:center"><span class="av">${ini(S.me.nome || S.me.email)}</span><div style="min-width:0"><div style="color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(S.me.nome || S.me.email)}</div>${PAPEIS[S.me.papel]}</div></div>
-      <div style="margin-top:8px;display:flex;gap:10px"><a href="#" data-act="site">Site</a><a href="#" data-act="sair">Sair</a></div></div>
+      <div style="margin-top:8px;display:flex;gap:10px"><a href="#" data-act="site">Site</a><a href="#" data-act="demo">${S.demo ? 'Sair da demo' : 'Demonstração'}</a><a href="#" data-act="sair">Sair</a></div></div>
     </aside>
-    <main class="main" id="main"></main>
+    <main class="main">${S.demo ? `<div class="demobar">◐ MODO DEMONSTRAÇÃO · dados de exemplo · nada é salvo<button class="btn sm" data-act="demo">Sair da demonstração</button></div>` : ''}<div id="main"></div></main>
     <nav class="bnav">
       <button data-v="painel" class="${atual === 'painel' ? 'on' : ''}"><span class="ic">◧</span>Painel</button>
       <button data-v="processos" class="${atual === 'processos' ? 'on' : ''}"><span class="ic">▤</span>Processos</button>
       <button class="plus" data-act="novo"><span class="ic">＋</span>Novo</button>
       <button data-v="clientes" class="${atual === 'clientes' ? 'on' : ''}"><span class="ic">◎</span>Clientes</button>
-      <button data-act="mais" class="${['leads', 'arquivo', 'equipe'].includes(atual) ? 'on' : ''}"><span class="ic">☰</span>Mais${nLeads + (S.me.papel === 'admin' ? nPend : 0) ? ' •' : ''}</button>
+      <button data-act="mais" class="${['fornecedores', 'leads', 'arquivo', 'equipe'].includes(atual) ? 'on' : ''}"><span class="ic">☰</span>Mais${nLeads + (S.me.papel === 'admin' ? nPend : 0) ? ' •' : ''}</button>
     </nav></div>`;
   $$('#erp [data-v]').forEach(b => b.onclick = () => ir(b.dataset.v));
-  $$('#erp [data-act]').forEach(b => b.onclick = e => { e.preventDefault(); const a = b.dataset.act; if (a === 'sair') sair(); else if (a === 'site') { erpIniciado = false; location.hash = ''; } else if (a === 'novo') novoProcesso(); else if (a === 'mais') menuMais(); });
-  const v = { painel: vPainel, processos: vProcessos, proc: vProc, clientes: vClientes, leads: vLeads, arquivo: vArquivo, equipe: vEquipe }[S.view] || vPainel;
+  $$('#erp [data-act]').forEach(b => b.onclick = e => { e.preventDefault(); const a = b.dataset.act; if (a === 'sair') sair(); else if (a === 'site') { erpIniciado = false; location.hash = ''; } else if (a === 'novo') novoProcesso(); else if (a === 'mais') menuMais(); else if (a === 'demo') alternaDemo(); });
+  const v = { painel: vPainel, processos: vProcessos, proc: vProc, clientes: vClientes, fornecedores: vFornecedores, leads: vLeads, arquivo: vArquivo, equipe: vEquipe }[S.view] || vPainel;
   v($('#main'));
 }
 function ir(v) { S.view = v; if (v !== 'proc') S.procId = null; render(); window.scrollTo(0, 0); }
 function menuMais() {
   const m = modal('Mais', `<div class="list">${NAV.slice(3).map(([k, l, en, ic]) => `<div class="it" data-go="${k}"><span class="av">${ic}</span><div><b>${l}</b><div class="s11 mut">${en}</div></div></div>`).join('')}
+    <div class="it" data-go="__demo"><span class="av">◐</span><div><b>${S.demo ? 'Sair da demonstração' : 'Demonstração'}</b><div class="s11 mut">${S.demo ? 'Voltar aos dados reais' : 'Casos de exemplo para apresentar · nada é salvo'}</div></div></div>
     <div class="it" data-go="__site"><span class="av">↗</span><div><b>Ver o site</b><div class="s11 mut">Página pública</div></div></div>
     <div class="it" data-go="__sair"><span class="av">⎋</span><div><b>Sair</b><div class="s11 mut">${esc(S.user.email)}</div></div></div></div>`, { noSave: true });
-  $$('[data-go]', m.form).forEach(el => el.onclick = () => { m.fechar(); const g = el.dataset.go; if (g === '__sair') sair(); else if (g === '__site') { erpIniciado = false; location.hash = ''; } else ir(g); });
+  $$('[data-go]', m.form).forEach(el => el.onclick = () => { m.fechar(); const g = el.dataset.go; if (g === '__sair') sair(); else if (g === '__demo') alternaDemo(); else if (g === '__site') { erpIniciado = false; location.hash = ''; } else ir(g); });
 }
 function topo(t, en, btns = '') { return `<div class="top"><h1><small>${en}</small>${t}</h1><span class="sp"></span>${btns}</div>`; }
 
@@ -838,6 +861,7 @@ function formProc(p = {}) {
   ${fld('outros_paises', 'Outros países envolvidos', p.outros_paises, { ph: 'Ex.: Vietnã (fábrica), Paraguai (trânsito)' })}
   <div class="row2"><div class="fld" data-f="responsavel"><label>Responsável</label><select name="responsavel">${ativosM.map(m => `<option value="${m.user_id}" ${resp === m.user_id ? 'selected' : ''}>${esc(m.nome || m.email)}</option>`).join('')}</select></div>
   <div class="fld"><label>Apoio</label><div class="pick" id="eqPick">${ativosM.map(m => `<button type="button" class="pb ${(p.equipe || []).includes(m.user_id) ? 'on' : ''}" data-uid="${m.user_id}">${esc((m.nome || m.email).split(' ')[0])}</button>`).join('')}</div><input type="hidden" name="equipe" value="${esc((p.equipe || []).join(','))}"></div></div>
+  ${S.fornOk ? `<div class="fld"><label>Fornecedores ligados</label><div class="pick" id="fornChips"></div><select id="addForn"><option value="">＋ Ligar fornecedor…</option>${S.forn.map(f => `<option value="${f.id}">${esc(f.empresa)}${f.categoria ? ' · ' + esc(f.categoria) : ''}</option>`).join('')}</select><input type="hidden" name="fornecedores" value="${esc((p.fornecedores || []).join(','))}"></div>` : ''}
   ${pick('etapa', 'Etapa', ETN[p.etapa || 'lead'], ETAPAS.map(e => e[1]), { only: true })}
   ${pick('prioridade', 'Prioridade', p.prioridade || 'Normal', PRIOS, { only: true })}
   <div class="row3">${pick('moeda', 'Moeda', p.moeda || 'USD', MOEDAS, { ph: 'outra…' })}${fld('valor_operacao', 'Valor da operação', p.valor_operacao, { num: true, ph: 'Ex.: 120.000' })}${fld('honorario', 'Nosso honorário', p.honorario, { num: true, ph: 'Ex.: 6.000 ou 5' })}</div>
@@ -850,6 +874,12 @@ function ligaFormProc(form) {
   const sel = form.cliente_id, box = $('#novoCli', form);
   const t = () => { box.hidden = sel.value !== '__novo'; if (!box.hidden) form.nc_nome.focus(); };
   sel.addEventListener('change', t); t();
+  if (form.fornecedores) {
+    const chips = () => { const ids = form.fornecedores.value.split(',').filter(Boolean); $('#fornChips', form).innerHTML = ids.map(i => `<button type="button" class="pb on" data-rf="${i}">${esc((fornDe(i) || {}).empresa || '?')} ✕</button>`).join('') || '<span class="s11 mut">Nenhum</span>'; };
+    $('#addForn', form).addEventListener('change', e => { const v = e.target.value; if (v) { const ids = form.fornecedores.value.split(',').filter(Boolean); if (!ids.includes(v)) ids.push(v); form.fornecedores.value = ids.join(','); chips(); form.dispatchEvent(new Event('input')); } e.target.value = ''; });
+    $('#fornChips', form).addEventListener('click', e => { const b = e.target.closest('[data-rf]'); if (!b) return; form.fornecedores.value = form.fornecedores.value.split(',').filter(x => x && x !== b.dataset.rf).join(','); chips(); form.dispatchEvent(new Event('input')); });
+    chips();
+  }
   $$('#eqPick .pb', form).forEach(b => b.addEventListener('click', () => { b.classList.toggle('on'); form.equipe.value = $$('#eqPick .pb.on', form).map(x => x.dataset.uid).join(','); form.dispatchEvent(new Event('input')); }));
 }
 function lerFormProc(form) {
@@ -860,7 +890,8 @@ function lerFormProc(form) {
     tipos: g('tipos').split(',').map(s => s.trim()).filter(Boolean), origem: g('origem') || null, destino: g('destino') || null, outros_paises: g('outros_paises') || null,
     responsavel: g('responsavel') || null, equipe: g('equipe').split(',').filter(Boolean), etapa: et, prioridade: g('prioridade') || 'Normal',
     moeda: g('moeda').toUpperCase() || 'USD', valor_operacao: parseNum(g('valor_operacao')), honorario: parseNum(g('honorario')), honorario_tipo: g('honorario_tipo') || null,
-    inicio: g('inicio') || null, prazo: g('prazo') || null, proximo_passo: g('proximo_passo') || null, proximo_em: g('proximo_em') || null, descricao: g('descricao') || null
+    inicio: g('inicio') || null, prazo: g('prazo') || null, proximo_passo: g('proximo_passo') || null, proximo_em: g('proximo_em') || null, descricao: g('descricao') || null,
+    ...(form.fornecedores ? { fornecedores: g('fornecedores').split(',').filter(Boolean) } : {})
   };
 }
 async function validaECriaCliente(form, d) {
@@ -909,15 +940,17 @@ function vProc(el) {
     <div class="meta"><span><b>Cliente</b>${c ? `<a href="#" id="verCli">${esc(c.nome)}</a>` : '—'}</span><span><b>Rota</b>${esc(rota(p))}${p.outros_paises ? ' · ' + esc(p.outros_paises) : ''}</span>
       <span><b>Responsável</b>${esc(nomeDe(p.responsavel))}${(p.equipe || []).length ? ' + ' + p.equipe.map(u => esc(nomeDe(u).split(' ')[0])).join(', ') : ''}</span>
       <span><b>Último contato</b>${contatoChip(p)}</span><span><b>Tipo</b>${esc((p.tipos || []).join(', ') || '—')}</span>
-      ${p.honorario != null ? `<span><b>Honorário</b>${money(p.honorario, p.moeda)}${p.honorario_tipo ? ' · ' + esc(p.honorario_tipo) : ''}</span>` : ''}
+      ${p.honorario != null ? `<span><b>Honorário</b>${/^%/.test(p.honorario_tipo || '') ? money(p.honorario) + '% sobre a operação' : money(p.honorario, p.moeda) + (p.honorario_tipo ? ' · ' + esc(p.honorario_tipo) : '')}</span>` : ''}
       ${p.valor_operacao != null ? `<span><b>Operação</b>${money(p.valor_operacao, p.moeda)}</span>` : ''}
-      ${p.prazo ? `<span><b>Prazo</b>${fData(p.prazo)}</span>` : ''}</div>
+      ${p.prazo ? `<span><b>Prazo</b>${fData(p.prazo)}</span>` : ''}
+      ${(p.fornecedores || []).length ? `<span><b>Fornecedores</b>${p.fornecedores.map(i => fornDe(i) ? `<a href="#" data-fo="${i}">${esc(fornDe(i).empresa)}</a>` : '').filter(Boolean).join(', ')}</span>` : ''}</div>
     ${p.proximo_passo || p.proximo_em ? `<div style="margin-top:8px" class="s11"><b class="mut">Próximo passo:</b> ${esc(p.proximo_passo || '')} ${p.proximo_em ? proxChip(p) : ''}</div>` : ''}
     <div class="etapas">${ETAPAS.map(([k, n], j) => `<button ${ed ? '' : 'disabled'} data-etapa="${k}" class="${j === i ? 'on' : j < i ? 'past' : ''}">${n}</button>`).join('')}</div>
   </div>
   <div class="ptabs"><button data-pt="hist" class="${S.ptab === 'hist' ? 'on' : ''}">Histórico (${S.eventos.filter(e => e.tipo !== 'Sistema').length})</button><button data-pt="arq" class="${S.ptab === 'arq' ? 'on' : ''}">Arquivos (${S.arquivos.length})</button><button data-pt="dados" class="${S.ptab === 'dados' ? 'on' : ''}">Dados</button></div>
   <div id="ptab"></div>`;
   $('#voltar').onclick = () => ir('processos');
+  $$('[data-fo]', el).forEach(a => a.onclick = e => { e.preventDefault(); editarFornecedor(fornDe(a.dataset.fo)); });
   const vc = $('#verCli'); if (vc) vc.onclick = e => { e.preventDefault(); editarCliente(c); };
   $$('[data-pt]', el).forEach(b => b.onclick = () => { S.ptab = b.dataset.pt; vProc(el); });
   $$('[data-etapa]', el).forEach(b => b.onclick = async () => {
@@ -1032,8 +1065,8 @@ function tabArq(box, p, ed) {
     });
   };
 }
-function verArquivo(id) {
-  const a = S.arquivos.find(x => x.id === id); if (!a) return;
+function verArquivo(id, lista) {
+  const a = (lista || S.arquivos).find(x => x.id === id); if (!a) return;
   if (a.url) { window.open(a.url, '_blank', 'noopener'); return; }
   const u = S.urls[a.caminho]; if (!u) return toast('Link do arquivo expirou. Recarregue a página.', true);
   const body = /^image\//.test(a.mime || '') ? `<img src="${esc(u)}" alt="">` : /^video\//.test(a.mime || '') ? `<video src="${esc(u)}" controls playsinline autoplay></video>` : `<div class="empty">Pré-visualização indisponível para este tipo.</div>`;
@@ -1166,12 +1199,13 @@ function vArquivo(el) {
   const l = S.processos.filter(p => (f === 'todos' ? (p.status === 'cancelado' || p.etapa === 'concluido') : f === 'concluidos' ? (p.etapa === 'concluido' && p.status === 'ativo') : p.status === 'cancelado'));
   el.innerHTML = topo('Arquivo', 'Archive') + `<div class="filters">${[['todos', 'Todos'], ['concluidos', 'Concluídos'], ['cancelados', 'Cancelados']].map(([k, n]) => `<button class="pb ${f === k ? 'on' : ''}" data-af="${k}">${n}</button>`).join('')}<span class="s11 mut">${l.length} processo(s)</span></div>
     <div class="card">${l.length ? `<div class="tsc"><table class="tb"><thead><tr><th>Nº</th><th>Processo</th><th>Situação</th><th class="hm">Data</th><th></th></tr></thead><tbody>${l.map(p => `<tr><td class="num">${esc(p.numero)}</td><td class="cl" data-p="${p.id}" style="cursor:pointer"><div style="font-weight:500">${esc(p.titulo)}</div><div class="s11 mut">${esc((cliDe(p.cliente_id) || {}).nome || '')}</div></td><td>${p.status === 'cancelado' ? '<span class="chip r">Cancelado</span>' : '<span class="chip t">Concluído</span>'}</td><td class="hm s11">${fData(p.status === 'cancelado' ? p.canceled_at : p.concluido_em)}</td><td>${editor() ? `<button class="btn sec sm" data-reat="${p.id}">Reativar</button>` : ''}</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty">Nada aqui.</div>'}</div>
-    <div class="card" style="margin-top:12px"><p class="s11 mut">Conectado como ${esc(S.user.email)} · ${PAPEIS[S.me.papel]}</p><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn sec sm" id="bkp">Copiar backup (JSON)</button><button class="btn sec sm" id="sair2">Sair desta conta</button></div></div>`;
+    <div class="card" style="margin-top:12px"><p class="s11 mut">Conectado como ${esc(S.user.email)} · ${PAPEIS[S.me.papel]}</p><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><button class="btn sec sm" id="demoB">${S.demo ? 'Sair da demonstração' : '◐ Demonstração'}</button><button class="btn sec sm" id="bkp">Copiar backup (JSON)</button><button class="btn sec sm" id="sair2">Sair desta conta</button></div></div>`;
   ligaComum(el);
   $$('[data-af]', el).forEach(b => b.onclick = () => { S.arqF = b.dataset.af; vArquivo(el); });
   $$('[data-reat]', el).forEach(b => b.onclick = async () => { const p = procDe(b.dataset.reat); try { await q(sb.from('nb_processos').update(p.status === 'cancelado' ? { status: 'ativo' } : { etapa: 'andamento' }).eq('id', p.id)); toast(p.numero + ' reativado'); await recarregar(); } catch (e) { toast(errMsg(e), true); } });
   $('#bkp').onclick = async () => { const txt = JSON.stringify({ exportado: new Date().toISOString(), clientes: S.clientes, processos: S.processos, leads: S.leads, equipe: S.membros }, null, 1); try { await navigator.clipboard.writeText(txt); toast('Backup copiado — cole num e-mail ou arquivo de texto'); } catch (e) { toast('Não consegui copiar automaticamente.', true); } };
   $('#sair2').onclick = sair;
+  $('#demoB').onclick = alternaDemo;
 }
 
 /* =================== ERP · EQUIPE =================== */
@@ -1197,6 +1231,309 @@ function vEquipe(el) {
     });
   });
 }
+
+/* =================== ERP · FORNECEDORES =================== */
+const estrelas = n => n ? '<span style="color:var(--gold);letter-spacing:1px">' + '★'.repeat(n) + '</span><span class="mut">' + '★'.repeat(5 - n) + '</span>' : '<span class="mut">—</span>';
+const fstChip = s => `<span class="chip ${s === 'Aprovado' ? 't' : s === 'Descartado' ? 'r' : s === 'Amostra pedida' ? 'g' : s === 'Em contato' ? 'a' : ''}">${esc(s || 'Novo')}</span>`;
+function vFornecedores(el) {
+  if (!S.fornOk) { el.innerHTML = topo('Fornecedores', 'Suppliers') + `<div class="card empty">Para usar Fornecedores, rode o <b>supabase.sql</b> novo (v2) no Supabase e recarregue o app.</div>`; return; }
+  const t = S.fq.toLowerCase(), usadas = [...new Set(S.forn.map(f => f.categoria).filter(Boolean))].sort();
+  const l = S.forn.filter(f => (S.fstF ? f.status === S.fstF : f.status !== 'Descartado') && (!S.fcatF || f.categoria === S.fcatF) &&
+    (!t || [f.empresa, f.contato, f.cidade, f.categoria, f.produtos, f.feira, f.wechat, f.email, f.notas].join(' ').toLowerCase().includes(t)));
+  el.innerHTML = topo('Fornecedores', 'Suppliers · contatos de feira', editor() ? `<button class="btn sec" id="impF">Colar lista</button><button class="btn" id="novoF">＋ Novo fornecedor</button>` : '') +
+    `<div class="filters"><input class="in" id="fqF" placeholder="Buscar empresa, produto, cidade, WeChat…" value="${esc(S.fq)}">
+      ${usadas.length > 1 ? `<button class="pb ${!S.fcatF ? 'on' : ''}" data-fcat="">Todas</button>${usadas.map(c => `<button class="pb ${S.fcatF === c ? 'on' : ''}" data-fcat="${esc(c)}">${esc(c)}</button>`).join('')}` : ''}
+      <select class="in" id="fstF"><option value="">Ativos (sem descartados)</option>${FSTAT.map(x => `<option ${S.fstF === x ? 'selected' : ''}>${x}</option>`).join('')}</select>
+      <span class="s11 mut">${l.length} fornecedor(es)</span></div>
+    <div class="card">${l.length ? `<div class="tsc"><table class="tb"><thead><tr><th>Fornecedor</th><th>Categoria</th><th class="hm">Onde · feira</th><th class="hm">Brasil?</th><th>Qualidade</th><th>Status</th><th class="hm">Processos</th></tr></thead><tbody>${l.map(f => {
+      const np = S.processos.filter(p => (p.fornecedores || []).includes(f.id)).length;
+      return `<tr class="cl" data-fo="${f.id}"><td style="min-width:150px"><div style="font-weight:500">${esc(f.empresa)}</div><div class="s11 mut">${esc(f.produtos || f.contato || '')}</div></td><td class="s11">${esc(f.categoria || '—')}</td><td class="hm s11">${esc([f.cidade, f.feira].filter(Boolean).join(' · ') || '—')}</td><td class="hm s11">${esc(f.fala_brasil || '—')}</td><td>${estrelas(f.nota)}</td><td>${fstChip(f.status)}</td><td class="hm s11">${np || ''}</td></tr>`;
+    }).join('')}</tbody></table></div>`
+      : `<div class="empty">${S.forn.length ? 'Nada encontrado.' : 'Nenhum fornecedor ainda. Cadastre os contatos das feiras aqui, com catálogos e vídeos.'}${editor() && !S.forn.length ? '<br><br><button class="btn sm" id="novoF2">＋ Cadastrar o primeiro</button> <button class="btn sec sm" id="impF2">Colar lista</button>' : ''}</div>`}</div>`;
+  const fq = $('#fqF'); fq.oninput = () => { S.fq = fq.value; const pos = fq.selectionStart; vFornecedores(el); const n = $('#fqF'); n.focus(); n.setSelectionRange(pos, pos); };
+  $$('[data-fcat]', el).forEach(b => b.onclick = () => { S.fcatF = b.dataset.fcat; vFornecedores(el); });
+  $('#fstF').onchange = e => { S.fstF = e.target.value; vFornecedores(el); };
+  $$('[data-fo]', el).forEach(r => r.onclick = () => editarFornecedor(fornDe(r.dataset.fo)));
+  ['#novoF', '#novoF2'].forEach(x => { const b = $(x, el); if (b) b.onclick = () => editarFornecedor(); });
+  ['#impF', '#impF2'].forEach(x => { const b = $(x, el); if (b) b.onclick = importarFornecedores; });
+}
+async function subirForn(fid, files, msgEl) {
+  let i = 0, falhas = [];
+  for (const f of files) {
+    i++; if (msgEl) msgEl.textContent = `Enviando ${i} de ${files.length}…`;
+    const path = `forn/${fid}/${Date.now()}-${Math.random().toString(36).slice(2, 6)}-${nomeSeguro(f.name)}`;
+    const up = await sb.storage.from(BUCKET).upload(path, f, { contentType: f.type || 'application/octet-stream', upsert: false });
+    if (up.error) { falhas.push(f.name + ': ' + errMsg(up.error)); continue; }
+    await q(sb.from('nb_arquivos').insert({ fornecedor_id: fid, processo_id: null, nome: f.name, caminho: path, mime: f.type, tamanho: f.size, categoria: /^image\//.test(f.type) ? 'Foto' : /^video\//.test(f.type) ? 'Vídeo' : 'Catálogo' }));
+  }
+  if (msgEl) msgEl.textContent = '';
+  if (falhas.length) toast('Não enviado: ' + falhas.join(' · '), true);
+}
+async function arquivosForn(fid) {
+  const a = ((await q(sb.from('nb_arquivos').select('*').eq('fornecedor_id', fid).order('created_at', { ascending: false }))) || []).filter(x => !x.removido_em);
+  const falta = a.filter(x => x.caminho && !S.urls[x.caminho]).map(x => x.caminho);
+  if (falta.length) { const { data } = await sb.storage.from(BUCKET).createSignedUrls(falta, 3600); (data || []).forEach(d => { if (d.signedUrl) S.urls[d.path] = d.signedUrl; }); }
+  return a;
+}
+function editarFornecedor(f) {
+  const novo = !f; f = f || {};
+  const ps = novo ? [] : S.processos.filter(p => (p.fornecedores || []).includes(f.id));
+  let pend = [], avisado = false, lista = [];
+  const m = modal(novo ? 'Novo fornecedor' : esc(f.empresa), `
+    <div class="row2">${fld('empresa', 'Empresa', f.empresa, { req: true, ph: 'Ex.: Shenzhen Xinda Electronics' })}${fld('contato', 'Pessoa de contato', f.contato, { ph: 'Ex.: Lily Chen (sales)' })}</div>
+    ${pick('categoria', 'Categoria', f.categoria || '', FCAT, { ph: 'ou digite uma nova…' })}
+    ${fld('produtos', 'Produtos', f.produtos, { ph: 'Ex.: anéis inteligentes, pulseiras fitness' })}
+    <div class="row2">${pick('pais', 'País', f.pais || 'China', PAISES)}${pick('cidade', 'Cidade', f.cidade || '', ['Shenzhen', 'Guangzhou', 'Dongguan', 'Yiwu', 'Ningbo', 'Xangai'])}</div>
+    ${pick('feira', 'Onde conheceu', f.feira || '', FEIRAS)}
+    <div class="row3">${fld('wechat', 'WeChat', f.wechat)}${fld('email', 'E-mail', f.email, { type: 'email' })}${fld('telefone', 'Telefone / WhatsApp', f.telefone)}</div>
+    <div class="row2">${fld('site', 'Site', f.site, { ph: 'www.…' })}${fld('moq', 'Pedido mínimo (MOQ)', f.moq, { ph: 'Ex.: 500 un.' })}</div>
+    ${pick('fala_brasil', 'Já vende / tem interesse no Brasil?', f.fala_brasil || '', ['Já vende para o Brasil', 'Tem interesse', 'Não prioriza'])}
+    <div class="row2">${pick('nota', 'Qualidade (1 a 5)', f.nota ? String(f.nota) : '', ['1', '2', '3', '4', '5'], { only: true })}${pick('status', 'Status', f.status || 'Novo', FSTAT, { only: true })}</div>
+    ${fld('notas', 'Notas', f.notas, { type: 'textarea', ph: 'Impressões da feira, preço citado, qualidade da amostra…' })}
+    <div class="fld"><label>Catálogos, fotos e vídeos</label>
+      <label class="drop" id="fdz" style="padding:14px"><input type="file" multiple hidden id="fdzF" accept="image/*,video/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"><b>Arraste aqui</b> <span class="s11">ou toque para escolher · até ${MAX_MB} MB</span><div class="s11" id="fdzMsg"></div></label>
+      <div class="attach" id="fpend"></div><div class="thumbs" id="flist">${novo ? '' : '<span class="s11 mut">Carregando…</span>'}</div></div>
+    ${!novo ? `<h4 style="font-size:12px;margin:10px 0 6px">Processos com este fornecedor (${ps.length})</h4>${ps.length ? `<div class="list">${ps.map(p => `<div class="it" data-pp="${p.id}"><span class="num">${esc(p.numero)}</span><div style="flex:1;min-width:0">${esc(p.titulo)}<div class="s11 mut">${p.status === 'cancelado' ? 'Cancelado' : ETN[p.etapa]}</div></div></div>`).join('')}</div>` : '<div class="s11 mut">Nenhum ainda.</div>'}` : ''}
+    <div id="fdup"></div>`, {
+    wide: true, noSave: !editor(),
+    extra: !novo && editor() ? '<button type="button" class="btn sec" id="procForn">＋ Abrir processo com ele</button>' : '',
+    onSave: async form => {
+      const g = n => form[n].value.trim();
+      const d = { empresa: g('empresa'), contato: g('contato') || null, categoria: g('categoria') || null, produtos: g('produtos') || null, pais: g('pais') || null, cidade: g('cidade') || null, feira: g('feira') || null, wechat: g('wechat') || null, email: g('email') || null, telefone: g('telefone') || null, site: g('site') || null, moq: g('moq') || null, fala_brasil: g('fala_brasil') || null, nota: g('nota') ? Number(g('nota')) : null, status: g('status') || 'Novo', notas: g('notas') || null };
+      if (!d.empresa) { marcaErro(form, 'empresa', 'Escreva o nome da empresa.'); return false; }
+      if (d.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(d.email)) { marcaErro(form, 'email', 'E-mail inválido.'); return false; }
+      const dup = S.forn.find(x => x.id !== f.id && x.empresa.trim().toLowerCase() === d.empresa.toLowerCase());
+      if (dup && !avisado) { avisado = true; $('#fdup').innerHTML = `<div class="warnbox">Já existe <b>${esc(dup.empresa)}</b>. Toque em Salvar de novo para cadastrar assim mesmo.</div>`; return false; }
+      let id = f.id;
+      if (novo) { const r = await q(sb.from('nb_fornecedores').insert(d).select().single()); id = r.id; }
+      else await q(sb.from('nb_fornecedores').update({ ...d, updated_at: new Date().toISOString() }).eq('id', f.id));
+      if (pend.length) await subirForn(id, pend, $('#fdzMsg'));
+      toast('Fornecedor salvo'); await recarregar();
+    }
+  });
+  const showPend = () => $('#fpend', m.form).innerHTML = pend.map((x, i) => `<span>${esc(x.name)} · ${fSize(x.size)} <a href="#" data-rp="${i}">✕</a></span>`).join('') + (pend.length ? '<span class="mut">(sobe ao salvar)</span>' : '');
+  $('#fpend', m.form).onclick = e => { const a = e.target.closest('[data-rp]'); if (!a) return; e.preventDefault(); pend.splice(Number(a.dataset.rp), 1); showPend(); };
+  const add = files => { for (const x of files) { if (x.size > MAX_MB * 1048576) { toast(`"${x.name}" passa de ${MAX_MB} MB.`, true); continue; } pend.push(x); } showPend(); m.form.dispatchEvent(new Event('input')); };
+  $('#fdzF', m.form).onchange = e => { add(e.target.files); e.target.value = ''; };
+  dropZone($('#fdz', m.form), add);
+  $$('[data-pp]', m.form).forEach(x => x.onclick = () => { m.fechar(); abrirProc(x.dataset.pp); });
+  const pf = $('#procForn', m.form);
+  if (pf) pf.onclick = () => { m.fechar(); novoProcesso({ titulo: [f.produtos || f.categoria, f.empresa].filter(Boolean).join(' — '), origem: f.pais || 'China', destino: 'Brasil', tipos: ['Compra e venda', 'Busca de fornecedor'], fornecedores: [f.id], etapa: 'lead' }); };
+  if (!novo) arquivosForn(f.id).then(a => {
+    lista = a; const el = $('#flist', m.form); if (!el) return;
+    el.innerHTML = a.length ? a.map(x => thumb(x)).join('') : '<span class="s11 mut">Nenhum arquivo ainda.</span>';
+    $$('.th', el).forEach(t => t.onclick = () => verArquivo(t.dataset.a, lista));
+  }).catch(e => toast(errMsg(e), true));
+}
+function importarFornecedores() {
+  const COLS = ['empresa', 'contato', 'cidade', 'categoria', 'produtos', 'feira', 'wechat', 'email', 'telefone', 'site'];
+  let linhas = [];
+  const m = modal('Colar lista de fornecedores', `<p class="s11 mut" style="margin-bottom:8px">Copie da planilha e cole abaixo. Ordem: <b>Empresa · Contato · Cidade · Categoria · Produtos · Feira · WeChat · E-mail · Telefone · Site</b>. Pode colar só as primeiras colunas.</p>
+    <textarea class="in" id="colaF" style="min-height:130px;font-size:12px" placeholder="Shenzhen Xinda	Lily Chen	Shenzhen	Wearables	smart rings	HK Electronics Fair"></textarea><div id="prevF" style="margin-top:10px"></div>`, {
+    wide: true, saveTxt: 'Importar', onSave: async () => {
+      const ok = linhas.filter(l => l._st === 'ok'); if (!ok.length) { toast('Nada pronto para importar.', true); return false; }
+      await q(sb.from('nb_fornecedores').insert(ok.map(l => { const o = { status: 'Novo', pais: 'China' }; COLS.forEach(k => o[k] = l[k] || null); return o; })));
+      toast(ok.length + ' fornecedor(es) importado(s)'); await recarregar();
+    }
+  });
+  const ta = $('#colaF', m.form), pv = $('#prevF', m.form);
+  ta.addEventListener('input', () => {
+    const vistos = new Set(S.forn.map(f => f.empresa.trim().toLowerCase()));
+    linhas = ta.value.split(/\r?\n/).filter(x => x.trim()).map(x => { const parts = x.split(x.includes('\t') ? '\t' : ';').map(s => s.trim()); const o = {}; COLS.forEach((k, i) => o[k] = parts[i] || ''); return o; })
+      .filter((o, i) => !(i === 0 && /^(empresa|company|fornecedor|supplier)$/i.test(o.empresa)));
+    linhas.forEach(o => { const k = o.empresa.toLowerCase(); o._st = !o.empresa ? 'erro' : vistos.has(k) ? 'dup' : 'ok'; if (o._st === 'ok') vistos.add(k); });
+    const n = s => linhas.filter(l => l._st === s).length;
+    pv.innerHTML = linhas.length ? `<div class="s11" style="margin-bottom:6px"><span class="chip t">${n('ok')} pronto(s)</span> <span class="chip a">${n('dup')} já cadastrado(s)</span> <span class="chip r">${n('erro')} sem nome</span></div>
+      <div class="tsc"><table class="tb prev"><thead><tr><th></th><th>Empresa</th><th>Contato</th><th>Cidade</th><th>Categoria</th><th>Produtos</th><th>Feira</th></tr></thead><tbody>${linhas.slice(0, 200).map(l => `<tr><td>${l._st === 'ok' ? '<span class="chip t">ok</span>' : l._st === 'dup' ? '<span class="chip a">existe</span>' : '<span class="chip r">sem nome</span>'}</td><td>${esc(l.empresa)}</td><td>${esc(l.contato)}</td><td>${esc(l.cidade)}</td><td>${esc(l.categoria)}</td><td>${esc(l.produtos)}</td><td>${esc(l.feira)}</td></tr>`).join('')}</tbody></table></div>` : '';
+  });
+}
+
+/* =================== ERP · MODO DEMONSTRAÇÃO =================== */
+function demoClient(DB, me) {
+  const uid = () => (crypto.randomUUID ? crypto.randomUUID() : 'd' + Math.random().toString(36).slice(2) + Date.now());
+  const now = () => new Date().toISOString(), clone = o => JSON.parse(JSON.stringify(o));
+  let seq = DB.nb_processos.reduce((a, p) => Math.max(a, p.seq || 0), 0);
+  const nomeMe = () => (DB.nb_membros.find(m => m.user_id === me) || {}).nome || 'Você';
+  const ev = (pid, tipo, texto) => DB.nb_eventos.push({ id: uid(), processo_id: pid, tipo, texto, data_evento: now(), autor: me, autor_nome: nomeMe(), created_at: now() });
+  function qb(t) {
+    let mode = 'select', payload = null, filters = [], ord = null, lim = null, single = false;
+    const api = {
+      select() { return api; }, insert(x) { mode = 'insert'; payload = x; return api; }, update(x) { mode = 'update'; payload = x; return api; },
+      eq(k, v) { filters.push([k, v]); return api; }, order(k, o) { ord = [k, !!(o && o.ascending === false)]; return api; }, limit(n) { lim = n; return api; }, single() { single = true; return api; },
+      then(res) { try { res(run()); } catch (e) { res({ data: null, error: { message: String(e.message || e) } }); } }
+    };
+    function run() {
+      const T = DB[t] = DB[t] || [], match = r => filters.every(([k, v]) => r[k] === v);
+      if (mode === 'insert') {
+        const out = (Array.isArray(payload) ? payload : [payload]).map(x => {
+          const r = { id: uid(), created_at: now(), ...clone(x) };
+          if (t === 'nb_processos') { seq++; r.seq = seq; r.numero = 'NB-' + new Date().getFullYear() + '-' + String(seq).padStart(4, '0'); r.status = 'ativo'; r.etapa = r.etapa || 'lead'; r.ultimo_contato = now(); r.created_by = me; r.updated_at = now(); }
+          if (t === 'nb_eventos') { r.autor = me; r.autor_nome = nomeMe(); r.data_evento = r.data_evento || r.created_at; }
+          if (t === 'nb_clientes') r.status = 'ativo';
+          if (t === 'nb_fornecedores') { r.status = r.status || 'Novo'; r.trazido_por = me; }
+          if (t === 'nb_arquivos') r.autor = me;
+          if (t === 'nb_leads') r.status = 'novo';
+          T.push(r);
+          if (t === 'nb_processos') ev(r.id, 'Sistema', 'Processo aberto: ' + r.numero);
+          if (t === 'nb_eventos' && r.tipo !== 'Sistema') { const p = DB.nb_processos.find(z => z.id === r.processo_id); if (p && (!p.ultimo_contato || p.ultimo_contato < r.data_evento)) p.ultimo_contato = r.data_evento; }
+          return r;
+        });
+        return { data: clone(single ? out[0] : out), error: null };
+      }
+      if (mode === 'update') {
+        T.filter(match).forEach(r => {
+          if (t === 'nb_processos') {
+            const msg = [];
+            if (payload.etapa && payload.etapa !== r.etapa) { msg.push('Etapa: ' + ETN[r.etapa] + ' → ' + ETN[payload.etapa] + '.'); r.concluido_em = payload.etapa === 'concluido' ? now() : null; }
+            if (payload.status && payload.status !== r.status) { msg.push(payload.status === 'cancelado' ? 'Processo cancelado.' : 'Processo reativado.'); r.canceled_at = payload.status === 'cancelado' ? now() : null; }
+            if ('responsavel' in payload && payload.responsavel !== r.responsavel) msg.push('Responsável: ' + nomeDe(r.responsavel) + ' → ' + nomeDe(payload.responsavel) + '.');
+            if ('honorario' in payload && payload.honorario !== r.honorario) msg.push('Honorário: ' + (r.honorario ?? '—') + ' → ' + (payload.honorario ?? '—') + ' ' + (payload.moeda || r.moeda || '') + '.');
+            if (msg.length) ev(r.id, 'Sistema', msg.join(' '));
+            r.updated_at = now();
+          }
+          Object.assign(r, clone(payload));
+        });
+        return { data: null, error: null };
+      }
+      let rows = T.filter(match).map(clone);
+      if (ord) rows.sort((a, b) => String(a[ord[0]] ?? '').localeCompare(String(b[ord[0]] ?? '')) * (ord[1] ? -1 : 1));
+      if (lim) rows = rows.slice(0, lim);
+      return { data: single ? rows[0] : rows, error: null };
+    }
+    return api;
+  }
+  const blobs = {};
+  return {
+    from: qb,
+    rpc: async (fn, a) => {
+      if (fn === 'nb_entrar') return { data: DB.nb_membros.find(m => m.user_id === me), error: null };
+      if (fn === 'nb_definir_membro') { const m = DB.nb_membros.find(x => x.user_id === a.p_user); if (m) { m.papel = a.p_papel || m.papel; m.status = a.p_status || m.status; if (a.p_nome) m.nome = a.p_nome; if (a.p_cidade) m.cidade = a.p_cidade; } }
+      return { data: null, error: null };
+    },
+    storage: { from: () => ({ upload: async (path, f) => { blobs[path] = URL.createObjectURL(f); return { data: { path }, error: null }; }, createSignedUrls: async paths => ({ data: paths.map(p => ({ path: p, signedUrl: blobs[p] || DB._urls[p] || null })), error: null }) }) },
+    auth: sbReal.auth
+  };
+}
+function demoImg(rot, c1, c2, ic) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c1}"/><stop offset="1" stop-color="${c2}"/></linearGradient></defs><rect width="640" height="480" fill="url(#g)"/><g fill="#fff" opacity=".13"><rect x="60" y="250" width="520" height="140" rx="8"/><rect x="100" y="140" width="140" height="110"/><rect x="270" y="110" width="110" height="140"/><rect x="410" y="160" width="130" height="90"/></g><text x="320" y="215" text-anchor="middle" font-size="96">${ic}</text><text x="320" y="440" text-anchor="middle" font-family="Arial,sans-serif" font-size="30" font-weight="700" fill="#fff">${rot}</text></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+}
+function demoPdf(t) {
+  t = String(t).replace(/[()\\]/g, '');
+  const st = `BT /F1 20 Tf 60 760 Td (New Bridges - documento de exemplo) Tj 0 -34 Td /F1 14 Tf (${t}) Tj 0 -28 Td (Modo demonstracao - arquivo ficticio.) Tj ET`;
+  const objs = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>', '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 842] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>', `<< /Length ${st.length} >>\nstream\n${st}\nendstream`, '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>'];
+  let pdf = '%PDF-1.4\n', offs = [];
+  objs.forEach((o, i) => { offs.push(pdf.length); pdf += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+  const x = pdf.length;
+  pdf += `xref\n0 ${objs.length + 1}\n0000000000 65535 f \n` + offs.map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${objs.length + 1} /Root 1 0 R >>\nstartxref\n${x}\n%%EOF`;
+  return 'data:application/pdf;base64,' + btoa(pdf);
+}
+function demoSeed(myId, myEmail) {
+  const DB = { nb_membros: [], nb_clientes: [], nb_processos: [], nb_eventos: [], nb_arquivos: [], nb_leads: [], nb_fornecedores: [], _urls: {} };
+  const ago = (d, h = 10, mi = 0) => { const x = new Date(); x.setDate(x.getDate() - d); x.setHours(h, mi, 0, 0); return x.toISOString(); };
+  const dia = n => addDias(n);
+  const M = { tae: myId, deb: 'demo-deb', gui: 'demo-gui', ped: 'demo-ped' };
+  DB.nb_membros.push(
+    { user_id: M.tae, email: myEmail, nome: 'Tae', papel: 'admin', status: 'ativo', cidade: 'São Paulo' },
+    { user_id: M.deb, email: 'debora@exemplo.com', nome: 'Débora', papel: 'socio', status: 'ativo', cidade: 'São Paulo' },
+    { user_id: M.gui, email: 'guilherme@exemplo.com', nome: 'Guilherme', papel: 'socio', status: 'ativo', cidade: 'Shenzhen' },
+    { user_id: M.ped, email: 'pedro@exemplo.com', nome: 'Pedro', papel: 'socio', status: 'ativo', cidade: 'São Paulo' },
+    { user_id: 'demo-tia', email: 'tiago@exemplo.com', nome: 'Tiago', papel: 'socio', status: 'pendente', cidade: '' });
+  const nm = { [M.tae]: 'Tae', [M.deb]: 'Débora', [M.gui]: 'Guilherme', [M.ped]: 'Pedro' };
+  const CL = {};
+  [['pedal', 'Pedal Brasil Distribuidora', 'Brasil', 'São Paulo', 'Ricardo Alves', 'Débora'], ['aqua', 'Huaxin Water Tech', 'China', 'Foshan', 'Mr. Zhou Wei', 'Guilherme'], ['curitiba', 'Grupo Araucária (3 empresários)', 'Brasil', 'Curitiba', 'Marcelo Kuhn', 'Pedro'],
+   ['cafe', 'Café Serra Azul', 'Brasil', 'Sul de Minas', 'Ana Paula Reis', 'Débora'], ['vision', 'RoadVision Auto Tech', 'China', 'Shenzhen', 'Ms. Lin Hui', 'Guilherme'], ['chef', 'Chef Renata Moura', 'Brasil', 'São Paulo', 'Renata Moura', 'Pedro'],
+   ['ring', 'Fit&Co Store', 'Brasil', 'Rio de Janeiro', 'Bruno Lacerda', 'Pedro'], ['carne', 'Frigorífico Vale Verde', 'Brasil', 'Goiás', 'José Henrique', 'Débora'], ['vento', 'Casa Fresca Varejo', 'Brasil', 'Recife', 'Patrícia Lima', 'Tae'], ['alho', 'Ajos del Sur', 'Argentina', 'Mendoza', 'Martín Gómez', 'Débora']]
+    .forEach(([k, nome, pais, cidade, contato, origem]) => { const id = 'demo-cli-' + k; CL[k] = id; DB.nb_clientes.push({ id, nome, pais, cidade, contato, origem, tipo: 'Empresa', status: 'ativo', created_at: ago(45), email: contato.toLowerCase().replace(/[^a-z]+/g, '.').replace(/^\.|\.$/g, '') + '@exemplo.com' }); });
+  const FO = {};
+  [['xinda', 'Shenzhen Xinda Smart Tech', 'Lily Chen', 'Shenzhen', 'Wearables', 'Anéis inteligentes, pulseiras fitness', 'HK Electronics Fair', 'Tem interesse', 4, 'Amostra pedida', '300 un.'],
+   ['velo', 'Tianjin Velo Bikes', 'Kevin Wang', 'Tianjin', 'Eletrônicos', 'Bicicletas elétricas urbanas e cargo', 'Canton Fair', 'Já vende para o Brasil', 5, 'Aprovado', '50 un.'],
+   ['eagle', 'Eagle Eye Security', 'Jack Liu', 'Shenzhen', 'Segurança / câmeras', 'Câmeras de ré para caminhão, câmeras Wi-Fi', 'HK Electronics Fair', 'Tem interesse', 3, 'Em contato', '200 un.'],
+   ['sono', 'Sonoro Audio Factory', 'Grace Wu', 'Dongguan', 'Áudio', 'Caixas de som para festa, fones', 'HK Electronics Fair', 'Não prioriza', 3, 'Novo', '1.000 un.'],
+   ['breeze', 'Breeze Home Appliances', 'Tony Zhang', 'Ningbo', 'Eletroportáteis', 'Ar-condicionado portátil, ventiladores', 'Canton Fair', 'Tem interesse', 4, 'Em contato', '500 un.'],
+   ['smile', 'SmileCare Oral', 'Amy He', 'Guangzhou', 'Higiene / beleza', 'Escovas elétricas, irrigadores', 'Canton Fair', 'Já vende para o Brasil', 4, 'Novo', '2.000 un.'],
+   ['pan', 'Yongkang Cookware', 'Mr. Huang', 'Yongkang', 'Casa e cozinha', 'Panelas de alumínio e inox, OEM com logo', 'Canton Fair', 'Tem interesse', 4, 'Amostra pedida', '500 un.'],
+   ['voice', 'MeetNote AI Recorder', 'Sunny Li', 'Shenzhen', 'Eletrônicos', 'Gravador de voz com IA para reuniões', 'HK Electronics Fair', 'Tem interesse', 5, 'Novo', '100 un.']]
+    .forEach(([k, empresa, contato, cidade, categoria, produtos, feira, fb, nota, status, moq]) => { const id = 'demo-for-' + k; FO[k] = id; DB.nb_fornecedores.push({ id, empresa, contato, cidade, pais: 'China', categoria, produtos, feira, fala_brasil: fb, nota, status, moq, wechat: contato.toLowerCase().replace(/[^a-z]/g, '') + '_cn', trazido_por: M.gui, created_at: ago(5), notas: k === 'xinda' ? 'Melhor qualidade entre os 6 de smart ring vistos. App bonito, ainda sem português.' : null }); });
+  let seq = 0, nArq = 0;
+  const arq = (pid, eid, nome, tipo, rot, c1, c2, ic, d, autor, forn) => {
+    nArq++; const path = 'demo/' + nArq + '-' + nome, ehImg = tipo === 'img';
+    DB._urls[path] = ehImg ? demoImg(rot, c1, c2, ic) : demoPdf(nome);
+    DB.nb_arquivos.push({ id: 'demo-arq-' + nArq, processo_id: pid, fornecedor_id: forn || null, evento_id: eid, nome, caminho: path, url: null, mime: ehImg ? 'image/svg+xml' : 'application/pdf', tamanho: ehImg ? 1800000 + nArq * 13000 : 640000, categoria: ehImg ? 'Foto' : /invoice|PI/i.test(nome) ? 'Invoice / PI' : /contrato/i.test(nome) ? 'Contrato' : /proposta/i.test(nome) ? 'Proposta' : 'PDF / documento', autor: autor || M.gui, created_at: d });
+  };
+  arq(null, null, 'catalogo-smart-rings-2026.pdf', 'pdf', '', '', '', '', ago(5), M.gui, FO.xinda);
+  arq(null, null, 'estande-xinda.jpg', 'img', 'Estande · HK Electronics Fair', '#1D4E89', '#3FC1B0', '💍', ago(5), M.gui, FO.xinda);
+  arq(null, null, 'linha-montagem-velo.jpg', 'img', 'Linha de montagem · Tianjin', '#3A2C10', '#D9B46A', '🚲', ago(20), M.gui, FO.velo);
+  const PROC = [
+    { k: 'pedal', titulo: 'Bicicletas elétricas — fábrica na China → distribuidor em SP', tipos: ['Compra e venda', 'Busca de fornecedor', 'Inspeção'], o: 'China', d: 'Brasil', resp: M.gui, eq: [M.deb], etapa: 'andamento', prio: 'Alta', moeda: 'USD', valor: 84000, hon: 5, honT: '% sobre a operação', ini: 42, prazo: 30, prox: 'Inspeção final da amostra antes do embarque', proxEm: 2, forn: [FO.velo],
+      desc: '120 bicicletas elétricas urbanas (2 modelos), marca do cliente. Pagamento 30% no pedido, 70% após inspeção. Entrega FOB Tianjin.',
+      ev: [[41, 'Reunião', M.deb, 'Reunião com o Ricardo (Pedal Brasil) no escritório da Paulista. Quer 2 modelos, marca própria, chegada antes de março.'],
+        [35, 'Visita', M.gui, 'Visitei 3 fábricas. Tianjin Velo é a melhor: já exporta para o Brasil, certificação ok, linha organizada.', [['fabrica-velo-1.jpg', 'Fábrica · Tianjin Velo', '#3A2C10', '#D9B46A', '🏭'], ['modelos-amostra.jpg', 'Amostras · 2 modelos', '#14284B', '#3FC1B0', '🚲']]],
+        [28, 'E-mail', M.tae, 'Enviada proposta ao cliente: 5% sobre a operação + inspeção.', [['proposta-NB-pedal.pdf']]],
+        [21, 'WhatsApp / WeChat', M.gui, 'Fábrica mandou a PI. Preço US$ 700/un. FOB, prazo 45 dias.', [['PI-Tianjin-Velo.pdf']]],
+        [18, 'Nota', M.deb, 'Cliente aprovou e pagou o sinal de 30% direto à fábrica. Contrato assinado.', [['contrato-pedal-brasil.pdf']]],
+        [4, 'Visita', M.gui, 'Produção 80% concluída. Fotos e vídeo da linha enviados ao cliente.', [['producao-80.jpg', 'Produção · 80%', '#0E2142', '#D9B46A', '🔧']]]],
+      etHist: [[40, 'Etapa: Lead → Proposta.'], [18, 'Etapa: Proposta → Em andamento.']] },
+    { k: 'aqua', titulo: 'Pesquisa de mercado — purificadores de água no Brasil', tipos: ['Pesquisa de mercado'], o: 'China', d: 'Brasil', resp: M.ped, eq: [M.gui], etapa: 'proposta', prio: 'Normal', moeda: 'USD', hon: 4500, honT: 'Valor fixo', ini: 12, prazo: 40, prox: 'Retorno da proposta (Mr. Zhou)', proxEm: 0,
+      desc: 'Fabricante chinês quer entender preço, concorrência, canais e regras do Inmetro/Anvisa para purificadores de água antes de entrar no Brasil.',
+      ev: [[12, 'Reunião', M.gui, 'Reunião em Foshan com Mr. Zhou. Querem um relatório em 30 dias, em inglês.'], [6, 'E-mail', M.ped, 'Proposta enviada: US$ 4.500, relatório + 10 entrevistas com distribuidores.', [['proposta-pesquisa-purificadores.pdf']]]] },
+    { k: 'curitiba', titulo: 'Missão à Canton Fair — 3 empresários de Curitiba', tipos: ['Feira', 'Pick-up / recepção', 'Busca de fornecedor'], o: 'Brasil', d: 'China', resp: M.gui, eq: [M.ped], etapa: 'aguardando', prio: 'Normal', moeda: 'BRL', hon: 18000, honT: 'Valor fixo', ini: 20, prazo: 160, prox: 'Cliente enviar passaportes para a carta-convite', proxEm: -3,
+      desc: 'Recepção no aeroporto de Guangzhou, hotel, intérprete e agenda de 5 dias na fase 1 da Canton Fair + 2 visitas a fábricas.',
+      ev: [[19, 'Ligação', M.ped, 'Marcelo confirmou 3 pessoas. Interesse: utilidades domésticas e iluminação.'], [11, 'Nota', M.gui, 'Montei o roteiro preliminar e pedi os passaportes para emitir a carta-convite.', [['roteiro-canton-fase1.pdf']]]] },
+    { k: 'cafe', titulo: 'Café especial do Sul de Minas para cafeterias em Xangai', tipos: ['Compra e venda', 'Pesquisa de mercado'], o: 'Brasil', d: 'China', resp: M.deb, eq: [M.gui], etapa: 'lead', prio: 'Normal', moeda: 'USD', ini: 3, prox: 'Pedir amostras e ficha técnica dos lotes', proxEm: 5,
+      desc: 'Produtor quer vender microlotes (85+ pontos). Guilherme sonda 2 redes de cafeterias em Xangai.',
+      ev: [[3, 'Reunião', M.deb, 'Café com a Ana Paula. Têm 40 sacas de microlote disponíveis por safra.']] },
+    { k: 'vision', titulo: 'Abertura de filial no Brasil — câmeras automotivas', tipos: ['Abertura de empresa', 'Contador / jurídico', 'Pesquisa de mercado'], o: 'China', d: 'Brasil', resp: M.tae, eq: [M.deb], etapa: 'andamento', prio: 'Urgente', moeda: 'USD', hon: 12000, honT: 'Valor fixo', ini: 30, prazo: 60, prox: 'Reunião com o contador indicado (CNPJ + Inmetro)', proxEm: 1, forn: [FO.eagle],
+      desc: 'Fabricante de câmeras de ré para caminhão quer CNPJ próprio no Brasil, conta bancária e homologação. Indicamos contador e escritório de comércio exterior.',
+      ev: [[29, 'Reunião', M.tae, 'Videochamada com Ms. Lin. Querem estar operando no 1º trimestre.'], [22, 'Nota', M.tae, 'Contrato de assessoria assinado.', [['contrato-roadvision.pdf']]], [10, 'E-mail', M.deb, 'Apresentei o contador e o despachante. Documentos da matriz em tradução juramentada.']] },
+    { k: 'chef', titulo: 'Panelas com a marca da Chef Renata (OEM)', tipos: ['Busca de fornecedor', 'Compra e venda'], o: 'China', d: 'Brasil', resp: M.ped, eq: [M.gui], etapa: 'proposta', prio: 'Normal', moeda: 'USD', valor: 18000, hon: 2500, honT: 'Valor fixo', ini: 15, prazo: 90, prox: 'Aprovar amostra da frigideira com logo', proxEm: 6, forn: [FO.pan],
+      desc: 'Linha com 3 peças (frigideira, caçarola, wok) com o nome da chef gravado. 500 kits no primeiro lote.',
+      ev: [[15, 'Reunião', M.ped, 'Renata mostrou o modelo que ela usa e quer igual, com o nome dela.'], [9, 'WhatsApp / WeChat', M.gui, 'Yongkang Cookware topa OEM com logo gravado a laser. Amostra em 10 dias.', [['amostra-frigideira.jpg', 'Amostra · frigideira com logo', '#2A1A0E', '#D9B46A', '🍳']]]] },
+    { k: 'ring', titulo: 'Smart rings — lote-teste de 300 unidades', tipos: ['Compra e venda', 'Inspeção'], o: 'China', d: 'Brasil', resp: M.gui, eq: [M.ped], etapa: 'andamento', prio: 'Alta', moeda: 'USD', valor: 15600, hon: 8, honT: '% sobre a operação', ini: 25, prazo: 45, prox: 'Cobrar versão em português do app', proxEm: -2, forn: [FO.xinda],
+      desc: 'Anel tipo Oura, 3 tamanhos e 2 cores. Cliente vende online. Condição: app em português.',
+      ev: [[24, 'Feira', M.gui, 'Vi 6 fornecedores na HK Electronics Fair; Xinda tem o melhor acabamento.', [['smart-ring-estande.jpg', 'Smart rings · HK', '#1D4E89', '#3FC1B0', '💍']]], [9, 'E-mail', M.gui, 'Pedido de 300 un. confirmado. Fábrica avalia traduzir o app.']] },
+    { k: 'carne', titulo: 'Carne bovina para importador na Coreia do Sul', tipos: ['Compra e venda', 'Pesquisa de mercado'], o: 'Brasil', d: 'Coreia do Sul', resp: M.tae, eq: [], etapa: 'lead', prio: 'Baixa', moeda: 'USD', ini: 8, prox: 'Verificar habilitação do frigorífico para a Coreia', proxEm: 10,
+      desc: 'Importador coreano procura cortes do dianteiro. Primeiro passo: checar se o frigorífico é habilitado para exportar à Coreia.',
+      ev: [[8, 'Ligação', M.tae, 'Conversei com o importador em Seul. Volume inicial: 2 contêineres/mês.']] },
+    { k: 'vento', titulo: 'Inspeção de 2 contêineres de ventiladores', tipos: ['Inspeção', 'Logística / frete'], o: 'China', d: 'Brasil', resp: M.gui, eq: [], etapa: 'concluido', prio: 'Normal', moeda: 'USD', hon: 1200, honT: 'Valor fixo', ini: 60, prox: null, forn: [FO.breeze],
+      desc: 'Inspeção pré-embarque (AQL 2.5) de 4.800 ventiladores em Ningbo.',
+      ev: [[58, 'Visita', M.gui, 'Inspeção feita: 2 caixas com defeito de acabamento, fábrica trocou na hora.', [['inspecao-ventiladores.jpg', 'Inspeção · AQL 2.5', '#0F2F2C', '#3FC1B0', '✅']]], [50, 'Nota', M.tae, 'Relatório entregue e honorário recebido.', [['relatorio-inspecao.pdf']]]],
+      etHist: [[49, 'Etapa: Em andamento → Concluído.']] },
+    { k: 'alho', titulo: 'Alho argentino para o Vietnã', tipos: ['Pesquisa de mercado', 'Compra e venda'], o: 'Argentina', d: 'Vietnã', resp: M.deb, eq: [], etapa: 'lead', prio: 'Normal', moeda: 'USD', ini: 35, prox: null, cancel: 20,
+      desc: 'Avaliar venda de alho argentino ao Vietnã.', ev: [[34, 'Reunião', M.deb, 'Conversa com o Martín.'], [21, 'Nota', M.deb, 'Preço da Ásia muito abaixo; produtor preferiu manter os mercados atuais. Encerrado por ora.']] }
+  ];
+  PROC.forEach(P => {
+    seq++; const id = 'demo-proc-' + P.k, aberto = ago(P.ini, 9);
+    const p = { id, numero: 'NB-' + new Date().getFullYear() + '-' + String(seq).padStart(4, '0'), seq, titulo: P.titulo, cliente_id: CL[P.k], tipos: P.tipos, origem: P.o, destino: P.d, responsavel: P.resp, equipe: P.eq, etapa: P.etapa, prioridade: P.prio, moeda: P.moeda, valor_operacao: P.valor ?? null, honorario: P.hon ?? null, honorario_tipo: P.honT || null, inicio: dia(-P.ini), prazo: P.prazo ? dia(P.prazo) : null, proximo_passo: P.prox, proximo_em: P.prox ? dia(P.proxEm) : null, descricao: P.desc, status: P.cancel ? 'cancelado' : 'ativo', canceled_at: P.cancel ? ago(P.cancel, 18) : null, concluido_em: P.etapa === 'concluido' ? ago(49, 17) : null, created_by: P.resp, created_at: aberto, updated_at: aberto, fornecedores: P.forn || [], ultimo_contato: aberto };
+    DB.nb_processos.push(p);
+    DB.nb_eventos.push({ id: id + '-e0', processo_id: id, tipo: 'Sistema', texto: 'Processo aberto: ' + p.numero, data_evento: aberto, autor: P.resp, autor_nome: nm[P.resp], created_at: aberto });
+    (P.etHist || []).forEach(([d, t], i) => DB.nb_eventos.push({ id: id + '-s' + i, processo_id: id, tipo: 'Sistema', texto: t, data_evento: ago(d, 17), autor: P.resp, autor_nome: nm[P.resp], created_at: ago(d, 17) }));
+    if (P.cancel) DB.nb_eventos.push({ id: id + '-c', processo_id: id, tipo: 'Sistema', texto: 'Processo cancelado.', data_evento: ago(P.cancel, 18), autor: P.resp, autor_nome: nm[P.resp], created_at: ago(P.cancel, 18) });
+    P.ev.forEach(([d, tipo, autor, texto, fs], i) => {
+      const eid = id + '-e' + (i + 1), dt = ago(d, 11 + (i % 6), 15 * (i % 4));
+      DB.nb_eventos.push({ id: eid, processo_id: id, tipo, texto, data_evento: dt, autor, autor_nome: nm[autor], created_at: dt });
+      if (dt > p.ultimo_contato) p.ultimo_contato = dt;
+      (fs || []).forEach(f => f.length > 1 ? arq(id, eid, f[0], 'img', f[1], f[2], f[3], f[4], dt, autor) : arq(id, eid, f[0], 'pdf', '', '', '', '', dt, autor));
+    });
+  });
+  DB.nb_leads.push(
+    { id: 'demo-lead-1', nome: 'Wang Lei', empresa: 'Guangdong Solar Lighting', email: 'wang@exemplo.cn', pais: 'China', idioma: 'zh', interesse: '在巴西销售', mensagem: '我们生产太阳能路灯，希望找到巴西的经销商。', status: 'novo', created_at: ago(1, 22) },
+    { id: 'demo-lead-2', nome: 'Fernanda Costa', empresa: 'Bella Pet Shop', email: 'fernanda@exemplo.com', telefone: '+55 11 9xxxx-xxxx', pais: 'Brasil', idioma: 'pt', interesse: 'Comprar da China', mensagem: 'Quero importar camas e brinquedos para pets com a minha marca. Volume inicial pequeno.', status: 'novo', created_at: ago(0, 7) });
+  return DB;
+}
+async function alternaDemo() {
+  try {
+    if (!S.demo) {
+      S._realMe = S.me; S.demo = true;
+      const seed = demoSeed(S.user.id, S.user.email);
+      sb = demoClient(seed, S.user.id); S.urls = { ...seed._urls }; S.me = seed.nb_membros[0];
+    } else { S.demo = false; sb = sbReal; S.urls = {}; S.me = S._realMe; }
+    S.view = 'painel'; S.procId = null; S.ptab = 'hist';
+    await carregar(); render(); window.scrollTo(0, 0);
+    toast(S.demo ? 'Modo demonstração: dados de exemplo. Pode mexer à vontade — nada é salvo.' : 'Você voltou aos dados reais.');
+  } catch (e) { toast(errMsg(e), true); }
+}
+
 
 /* =================== INÍCIO =================== */
 aplicaIdioma();
